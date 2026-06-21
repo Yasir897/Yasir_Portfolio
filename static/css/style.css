@@ -169,6 +169,33 @@ ul { list-style: none; }
 }
 
 /* ============================
+   SPIDER CANVAS (follows cursor)
+   ============================ */
+#spider-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ============================
+   TOP SCROLL PROGRESS BAR
+   ============================ */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--grad-main);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+  z-index: 1001;
+  will-change: transform;
+}
+
+/* ============================
    CINEMATIC INTRO
    ============================ */
 #intro-overlay {

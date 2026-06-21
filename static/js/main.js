@@ -490,6 +490,114 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(frame);
   })();
 
+  /* ─── TOP SCROLL PROGRESS BAR ─── */
+  const progressBar = document.getElementById('scroll-progress');
+  if (progressBar) {
+    const updateProgress = () => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      const ratio = max > 0 ? doc.scrollTop / max : 0;
+      progressBar.style.transform = `scaleX(${ratio})`;
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  }
+
+  /* ─── BACKGROUND SPIDER (follows the cursor) ─── */
+  (function initSpider() {
+    const c = document.getElementById('spider-canvas');
+    if (!c) return;
+    const x = c.getContext('2d');
+    let W, H;
+    function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let mx = window.innerWidth / 2, my = window.innerHeight * 0.4;
+    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+    const body = { x: mx, y: my, heading: 0 };
+    const REACH = 78, STEP_THRESH = 50, EASE = 0.05;
+
+    // 8 legs — 4 each side, spread around the body's perpendicular
+    const legs = [];
+    [-1, 1].forEach(side => {
+      [0.55, 0.2, -0.2, -0.55].forEach(spread => {
+        legs.push({ side, spread, foot: { x: body.x, y: body.y }, stepping: false });
+      });
+    });
+
+    function frame() {
+      // chase the cursor
+      body.x += (mx - body.x) * EASE;
+      body.y += (my - body.y) * EASE;
+      const vx = mx - body.x, vy = my - body.y;
+      if (Math.hypot(vx, vy) > 1.2) body.heading = Math.atan2(vy, vx);
+      const hd = body.heading;
+
+      x.clearRect(0, 0, W, H);
+
+      // legs
+      for (const leg of legs) {
+        const perp = hd + (Math.PI / 2) * leg.side;
+        const sx = body.x + Math.cos(perp) * 7;
+        const sy = body.y + Math.sin(perp) * 7;
+        const footAngle = hd + leg.side * (Math.PI / 2) + leg.spread;
+        const ix = body.x + Math.cos(footAngle) * REACH;
+        const iy = body.y + Math.sin(footAngle) * REACH;
+
+        if (Math.hypot(leg.foot.x - ix, leg.foot.y - iy) > STEP_THRESH) leg.stepping = true;
+        if (leg.stepping) {
+          leg.foot.x += (ix - leg.foot.x) * 0.3;
+          leg.foot.y += (iy - leg.foot.y) * 0.3;
+          if (Math.hypot(leg.foot.x - ix, leg.foot.y - iy) < 4) leg.stepping = false;
+        }
+
+        // bent knee (lift perpendicular to the leg line)
+        const midx = (sx + leg.foot.x) / 2, midy = (sy + leg.foot.y) / 2;
+        const lAng = Math.atan2(leg.foot.y - sy, leg.foot.x - sx);
+        const knx = midx + Math.cos(lAng - (Math.PI / 2) * leg.side) * 16;
+        const kny = midy + Math.sin(lAng - (Math.PI / 2) * leg.side) * 16;
+
+        x.beginPath();
+        x.moveTo(sx, sy);
+        x.quadraticCurveTo(knx, kny, leg.foot.x, leg.foot.y);
+        x.strokeStyle = 'rgba(168, 85, 247, 0.5)';
+        x.lineWidth = 1.8;
+        x.shadowBlur = 8;
+        x.shadowColor = 'rgba(168, 85, 247, 0.6)';
+        x.stroke();
+
+        x.beginPath();
+        x.arc(leg.foot.x, leg.foot.y, 2, 0, Math.PI * 2);
+        x.fillStyle = 'rgba(34, 211, 238, 0.7)';
+        x.fill();
+      }
+
+      // abdomen
+      const ax = body.x - Math.cos(hd) * 11, ay = body.y - Math.sin(hd) * 11;
+      x.shadowBlur = 18; x.shadowColor = 'rgba(168, 85, 247, 0.8)';
+      const g = x.createRadialGradient(ax, ay, 1, ax, ay, 13);
+      g.addColorStop(0, 'rgba(236, 72, 153, 0.9)');
+      g.addColorStop(1, 'rgba(124, 58, 237, 0.65)');
+      x.beginPath();
+      x.ellipse(ax, ay, 12, 9.5, hd, 0, Math.PI * 2);
+      x.fillStyle = g;
+      x.fill();
+
+      // head
+      const hx = body.x + Math.cos(hd) * 6, hy = body.y + Math.sin(hd) * 6;
+      x.beginPath();
+      x.arc(hx, hy, 6, 0, Math.PI * 2);
+      x.fillStyle = 'rgba(34, 211, 238, 0.9)';
+      x.fill();
+      x.shadowBlur = 0;
+
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
   /* ─── GLITCH EFFECT ON HERO NAME ─── */
   const heroName = document.querySelector('.hero-name');
   if (heroName) {
