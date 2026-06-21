@@ -198,9 +198,9 @@ ul { list-style: none; }
   background: var(--bg-deep);
   transition: opacity 0.7s ease;
 }
-#intro-overlay.split-ready {
-  background: linear-gradient(135deg, #1a0b2e 0%, #06060c 60%);
-}
+/* When the split fires, the overlay backdrop becomes transparent so the
+   real hero (behind the sliding panels) is revealed — no black flash. */
+#intro-overlay.split-ready { background: transparent; }
 #intro-overlay.fading { opacity: 0; pointer-events: none; }
 #intro-overlay.done   { display: none; }
 

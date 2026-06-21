@@ -15,9 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const introSub    = document.querySelector('.intro-subtitle');
   const heroSection = document.getElementById('hero');
 
-  // Hero waits below — rises when overlay fades
+  // Hero waits just below, ready to be revealed AS the panels slide away
   heroSection.style.opacity   = '0';
-  heroSection.style.transform = 'translateY(80px)';
+  heroSection.style.transform = 'translateY(46px) scale(0.992)';
 
   // Phase 1 — Name slides in, staggered
   setTimeout(() => introInit  && introInit.classList.add('visible'),  200);
@@ -25,33 +25,32 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => introLast  && introLast.classList.add('visible'),  600);
   setTimeout(() => introSub   && introSub.classList.add('visible'),   800);
 
-  // Phase 2 — Hold 2 seconds (800ms → 2800ms)
+  // Phase 2 — Hold (~1.8s)
 
   // Phase 3 — Name fades out
-  setTimeout(() => introName.classList.add('hidden-name'), 2800);
+  setTimeout(() => introName.classList.add('hidden-name'), 2600);
 
-  // Phase 4 — Overlay bg instantly → WHITE, pieces split ↖ and ↘
+  // Phase 4 — Panels slide apart (overlay turns transparent) AND the hero
+  //           animates in at the same moment → one seamless, cinematic motion
   setTimeout(() => {
-    overlay.classList.add('split-ready');
+    overlay.classList.add('split-ready');     // backdrop → transparent (hero shows through)
     introTop.classList.add('exit');
     introBot.classList.add('exit');
-  }, 2950);
-
-  // Phase 6 — Overlay fades away + Hero rises from below simultaneously
-  setTimeout(() => {
-    overlay.classList.add('fading');
-    heroSection.style.transition = 'opacity 1.1s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1)';
+    heroSection.style.transition = 'opacity 1.1s ease, transform 1.25s cubic-bezier(0.16, 1, 0.3, 1)';
     heroSection.style.opacity    = '1';
-    heroSection.style.transform  = 'translateY(0)';
-  }, 4100);
+    heroSection.style.transform  = 'translateY(0) scale(1)';
+  }, 2750);
 
-  // Phase 7 — Overlay completely removed, cleanup
+  // Phase 5 — Once the panels have slid off, fade the (now empty) overlay out
+  setTimeout(() => overlay.classList.add('fading'), 3650);
+
+  // Phase 6 — Remove overlay & clean up hero inline styles
   setTimeout(() => {
     overlay.classList.add('done');
     heroSection.style.transition = '';
     heroSection.style.opacity    = '';
     heroSection.style.transform  = '';
-  }, 4900);
+  }, 4400);
 
   /* ─── CUSTOM CURSOR ─── */
   const dot = document.createElement('div');
@@ -160,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.toggle('leaving-up', entry.boundingClientRect.top < window.innerHeight * 0.5);
       }
     });
-  }, { threshold: 0.05, rootMargin: '-12% 0px -12% 0px' });
+  }, { threshold: 0.05, rootMargin: '-24% 0px -10% 0px' });
 
   revealEls.forEach(el => revealObserver.observe(el));
 
