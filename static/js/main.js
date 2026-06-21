@@ -329,10 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!icons.length) return;
 
     const ICON_HALF = 22;       // half chip size (px)
-    const R_MIN = 0.66;         // keep symbols farther from the name
-    const R_MAX = 0.96;         // stay inside the system
-    const MIN_DIST = 56;        // min centre-to-centre between logos (no overlap)
-    const V_MIN = 14, V_MAX = 42;   // px/s speed bounds (always moving)
+    const R_MIN = 0.50;         // orbit closer to the name (centre stays the focus)
+    const R_MAX = 0.82;         // stay inside the system
+    const MIN_DIST = 54;        // min centre-to-centre between logos (no overlap)
+    const V_MIN = 14, V_MAX = 40;   // px/s speed bounds (always moving)
 
     function radius() {
       const w = system.offsetWidth;
@@ -360,17 +360,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let r0 = radius();
     const st = icons.map((el, i) => {
       const ang = (i / icons.length) * Math.PI * 2 + Math.random() * 0.6;
-      const rad = r0 * (0.72 + Math.random() * 0.22);
+      const rad = r0 * (0.56 + Math.random() * 0.2);
       const sp = 20 + Math.random() * 14;
       const dir = Math.random() * Math.PI * 2;
       const s = {
-        el, frozen: false, tether: null, kick: 1 + Math.random() * 2.5,
+        el, frozen: false, tether: null, clickT: 0, kick: 1 + Math.random() * 2.5,
         x: Math.cos(ang) * rad, y: Math.sin(ang) * rad,
         vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp
       };
       // Hover → freeze this logo (so it's easy to click) + highlight
       el.addEventListener('mouseenter', () => { s.frozen = true; el.classList.add('is-hover'); });
       el.addEventListener('mouseleave', () => { s.frozen = false; el.classList.remove('is-hover'); });
+      // Click → bounce + spin + glow burst (visible "living" feedback)
+      el.addEventListener('mousedown', () => {
+        s.clickT = 0.55;
+        el.classList.add('clicked');
+        setTimeout(() => el.classList.remove('clicked'), 560);
+      });
       return s;
     });
 
@@ -390,19 +396,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Web tether: shoot → pull toward the core → release ──
         if (s.tether) {
           const T = s.tether; T.t += dt;
-          const SHOOT = 0.28, PULL = 0.6, REL = 0.22;
+          const SHOOT = 0.45, PULL = 1.0, REL = 0.5;          // slow, premium pacing
           if (T.t < SHOOT) {
-            setPolar(s, T.ang, T.startR);                     // thread reaching out
+            setPolar(s, T.ang, T.startR);                     // silk reaching out
           } else if (T.t < SHOOT + PULL) {
             const p = (T.t - SHOOT) / PULL;
-            const e = 1 - Math.pow(1 - p, 3);                 // easeOutCubic
-            const endR = Math.max(rMin * 1.05, T.startR * 0.48);
-            setPolar(s, T.ang, T.startR + (endR - T.startR) * e);  // pulled in
+            const e = p * p * (3 - 2 * p);                    // smoothstep (organic)
+            const endR = Math.max(rMin * 1.08, T.startR * 0.7);  // gentle pull (not yanked)
+            setPolar(s, T.ang, T.startR + (endR - T.startR) * e);
           } else if (T.t < SHOOT + PULL + REL) {
-            /* hold briefly near the core */
+            /* hold gently near the core */
           } else {
-            s.vx = Math.cos(T.ang) * V_MAX * 0.9;             // released — drifts back out
-            s.vy = Math.sin(T.ang) * V_MAX * 0.9;
+            s.vx = Math.cos(T.ang) * V_MAX * 0.55;            // soft release — drifts back out
+            s.vy = Math.sin(T.ang) * V_MAX * 0.55;
             s.tether = null;
           }
           continue;
@@ -453,52 +459,76 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       for (const s of st) {
-        const sc = s.frozen ? ' scale(1.25)' : '';
-        s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)${sc}`;
+        let extra = '';
+        if (s.clickT > 0) {
+          s.clickT = Math.max(0, s.clickT - dt);
+          const p = 1 - s.clickT / 0.55;                 // 0 → 1
+          const bounce = 1 + Math.sin(p * Math.PI) * 0.45;  // pop out & back
+          extra = ` scale(${bounce.toFixed(3)}) rotate(${(p * 360).toFixed(1)}deg)`;
+        } else if (s.frozen) {
+          extra = ' scale(1.25)';
+        }
+        s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)${extra}`;
       }
 
-      // ── Randomly tether a far, free symbol back toward the core ──
+      // ── Occasionally tether a far, free symbol back toward the core ──
       tetherTimer -= dt;
       if (tetherTimer <= 0) {
-        const far = st.filter(s => !s.tether && !s.frozen && Math.hypot(s.x, s.y) > rMax * 0.8);
+        const far = st.filter(s => !s.tether && !s.frozen && Math.hypot(s.x, s.y) > rMax * 0.72);
         if (far.length) {
           const s = far[(Math.random() * far.length) | 0];
           s.tether = { t: 0, ang: Math.atan2(s.y, s.x), startR: Math.hypot(s.x, s.y) };
         }
-        tetherTimer = 1.0 + Math.random() * 1.8;
+        tetherTimer = 2.4 + Math.random() * 2.6;          // calmer, elegant frequency
       }
 
-      // ── Draw the silk web threads (core → tethered symbols) ──
+      // ── Draw organic spider-silk threads (core → tethered symbols) ──
       if (wctx) {
         wctx.clearRect(0, 0, cssSize, cssSize);
         const cx = cssSize / 2, cy = cssSize / 2;
-        const total = 0.28 + 0.6 + 0.22;
+        const total = 0.45 + 1.0 + 0.5;
         for (const s of st) {
           if (!s.tether) continue;
           const T = s.tether;
-          let reach = 1, alpha = 0.75;
-          if (T.t < 0.28) reach = T.t / 0.28;                       // thread growing out
-          else if (T.t > total - 0.22) alpha = 0.75 * Math.max(0, 1 - (T.t - (total - 0.22)) / 0.22);
-          const ex = cx + s.x, ey = cy + s.y;
-          const tx = cx + (ex - cx) * reach, ty = cy + (ey - cy) * reach;
-          const dx = tx - cx, dy = ty - cy, len = Math.hypot(dx, dy) || 1;
-          const px = -dy / len, py = dx / len;
-          wctx.beginPath();
-          wctx.moveTo(cx, cy);
-          for (let i = 1; i <= 6; i++) {
-            const f = i / 6;
-            const amp = Math.sin(f * Math.PI) * 4 * Math.sin(now * 0.008 + f * 6);  // silk wobble
-            wctx.lineTo(cx + dx * f + px * amp, cy + dy * f + py * amp);
+          let reach = 1, alpha = 0.55;
+          if (T.t < 0.45) { reach = T.t / 0.45; alpha = 0.55 * reach; }        // silk extends out
+          else if (T.t > total - 0.5) alpha = 0.55 * Math.max(0, 1 - (T.t - (total - 0.5)) / 0.5);  // fades on release
+          const tx = cx + s.x * reach, ty = cy + s.y * reach;
+          let dx = tx - cx, dy = ty - cy; const len = Math.hypot(dx, dy) || 1;
+          // perpendicular, biased downward → natural silk droop (catenary)
+          let px = -dy / len, py = dx / len;
+          if (py < 0) { px = -px; py = -py; }
+          const sag = Math.min(len * 0.13, 22);
+
+          function strand(extraSag, width, a) {
+            wctx.beginPath();
+            wctx.moveTo(cx, cy);
+            for (let i = 1; i <= 18; i++) {
+              const f = i / 18;
+              const droop = Math.sin(f * Math.PI) * (sag + extraSag);
+              wctx.lineTo(cx + dx * f + px * droop, cy + dy * f + py * droop);
+            }
+            wctx.strokeStyle = 'rgba(216,221,250,' + a + ')';
+            wctx.lineWidth = width;
+            wctx.stroke();
           }
-          wctx.strokeStyle = 'rgba(168,85,247,' + alpha + ')';
-          wctx.lineWidth = 1.4;
-          wctx.shadowBlur = 8; wctx.shadowColor = 'rgba(168,85,247,0.7)';
-          wctx.stroke();
+          // soft pale-silk glow, then crisp strand + a fainter parallel filament
+          wctx.shadowBlur = 3; wctx.shadowColor = 'rgba(190,180,255,0.35)';
+          strand(0, 1.0, alpha);
           wctx.shadowBlur = 0;
-          wctx.beginPath();
-          wctx.arc(tx, ty, 3, 0, 6.2832);                          // hook glow at the symbol
-          wctx.fillStyle = 'rgba(34,211,238,' + alpha + ')';
-          wctx.fill();
+          strand(3.5, 0.6, alpha * 0.35);
+
+          // silk wrapping the hooked symbol (only when fully reached)
+          if (reach > 0.985) {
+            const base = Math.atan2(dy, dx);
+            for (let k = 0; k < 3; k++) {
+              wctx.beginPath();
+              wctx.arc(tx, ty, 9 + k * 3.5, base + k * 0.6, base + k * 0.6 + 2.3);
+              wctx.strokeStyle = 'rgba(216,221,250,' + (alpha * 0.5) + ')';
+              wctx.lineWidth = 0.8;
+              wctx.stroke();
+            }
+          }
         }
       }
 
