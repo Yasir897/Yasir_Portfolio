@@ -354,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', sizeWeb);
 
     const setPolar = (s, ang, r) => { s.x = Math.cos(ang) * r; s.y = Math.sin(ang) * r; };
-    let tetherTimer = 2 + Math.random() * 1.5;
 
     // Initial spread at varied radii + random headings
     let r0 = radius();
@@ -364,7 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const sp = 20 + Math.random() * 14;
       const dir = Math.random() * Math.PI * 2;
       const s = {
-        el, frozen: false, tether: null, clickT: 0, kick: 1 + Math.random() * 2.5,
+        el, frozen: false, tether: null, clickT: 0, cooldown: Math.random() * 3,
+        kick: 1 + Math.random() * 2.5,
         x: Math.cos(ang) * rad, y: Math.sin(ang) * rad,
         vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp
       };
@@ -379,6 +379,84 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       return s;
     });
+
+    // ── Cute spider-bot that lives among the symbols ──
+    const bot = {
+      x: cssSize * 0.5, y: cssSize * 0.22, tx: cssSize * 0.5, ty: cssSize * 0.3,
+      state: 'wander', stT: 0, legT: 0, anchor: null, swing: 0.6, swingV: 0, thread: 0
+    };
+    function botWander() {
+      const R = radius(), a = Math.random() * Math.PI * 2, rr = R * (0.45 + Math.random() * 0.5);
+      bot.tx = cssSize / 2 + Math.cos(a) * rr;
+      bot.ty = cssSize / 2 + Math.sin(a) * rr;
+    }
+    function botUpdate(dt) {
+      bot.stT += dt;
+      const cx = cssSize / 2, cy = cssSize / 2;
+      const moving = Math.hypot(bot.tx - bot.x, bot.ty - bot.y) > 4;
+      bot.legT += dt * (moving ? 9 : 3);
+      if (bot.state === 'swing') {
+        bot.thread = Math.min(1, bot.thread + dt * 2.5);
+        bot.swingV += -Math.sin(bot.swing) * 6 * dt;     // pendulum
+        bot.swingV *= 0.992;
+        bot.swing += bot.swingV * dt;
+        const ax = cx + (bot.anchor ? bot.anchor.x : 0), ay = cy + (bot.anchor ? bot.anchor.y : 0);
+        const L = 36;
+        bot.x = ax + Math.sin(bot.swing) * L;
+        bot.y = ay + Math.abs(Math.cos(bot.swing)) * L;
+        if (bot.stT > 3.4) { bot.stT = 0; bot.state = 'wander'; botWander(); }
+        return;
+      }
+      // wander / rest both ease toward target
+      bot.x += (bot.tx - bot.x) * Math.min(1, dt * 1.6);
+      bot.y += (bot.ty - bot.y) * Math.min(1, dt * 1.6);
+      const done = !moving || bot.stT > (bot.state === 'rest' ? 4.5 : 3.8);
+      if (done) {
+        bot.stT = 0;
+        const r = Math.random();
+        if (r < 0.4 && st.length) {                       // swing on a symbol
+          bot.anchor = st[(Math.random() * st.length) | 0];
+          bot.swing = (Math.random() - 0.5) * 0.9; bot.swingV = (Math.random() - 0.5) * 2.4;
+          bot.thread = 0; bot.state = 'swing';
+        } else if (r < 0.68) {                            // perch just above the name
+          bot.state = 'rest';
+          bot.tx = cx + (Math.random() - 0.5) * cssSize * 0.22;
+          bot.ty = cy - cssSize * 0.085;
+        } else {                                          // keep wandering
+          bot.state = 'wander'; botWander();
+        }
+      }
+    }
+    function botDraw(g) {
+      const cx = cssSize / 2, cy = cssSize / 2, bx = bot.x, by = bot.y;
+      if (bot.state === 'swing' && bot.anchor) {          // silk it hangs from
+        g.strokeStyle = 'rgba(216,221,250,0.5)'; g.lineWidth = 1;
+        g.beginPath(); g.moveTo(cx + bot.anchor.x, cy + bot.anchor.y); g.lineTo(bx, by); g.stroke();
+      }
+      g.lineCap = 'round';
+      g.strokeStyle = 'rgba(200,170,255,0.9)'; g.lineWidth = 1.4;
+      for (let i = 0; i < 8; i++) {                        // 8 legs with gentle twitch
+        const side = i < 4 ? 1 : -1;
+        const a = side * (0.7 + (i % 4) * 0.45) + Math.sin(bot.legT + i) * 0.12;
+        const kx = bx + Math.cos(a) * 6, ky = by + Math.abs(Math.sin(a)) * 5 - 1;
+        const fx = bx + Math.cos(a) * 11, fy = by + Math.abs(Math.sin(a)) * 9 + 3 + Math.sin(bot.legT + i) * 1.2;
+        g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(kx, ky, fx, fy); g.stroke();
+      }
+      g.save();                                            // round glowing body
+      g.shadowColor = 'rgba(168,85,247,0.8)'; g.shadowBlur = 10;
+      const grad = g.createRadialGradient(bx, by, 1, bx, by, 9);
+      grad.addColorStop(0, '#f0abfc'); grad.addColorStop(1, '#7c3aed');
+      g.fillStyle = grad;
+      g.beginPath(); g.arc(bx, by, 7, 0, 6.2832); g.fill();
+      g.restore();
+      g.fillStyle = '#fff';                                // cute big eyes
+      g.beginPath(); g.arc(bx - 2.4, by - 1.2, 2.2, 0, 6.2832); g.fill();
+      g.beginPath(); g.arc(bx + 2.4, by - 1.2, 2.2, 0, 6.2832); g.fill();
+      g.fillStyle = '#0b0b14';
+      g.beginPath(); g.arc(bx - 2.1, by - 1.0, 1.0, 0, 6.2832); g.fill();
+      g.beginPath(); g.arc(bx + 2.7, by - 1.0, 1.0, 0, 6.2832); g.fill();
+    }
+    botWander();
 
     let last = performance.now();
     function frame(now) {
@@ -410,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
             s.vx = Math.cos(T.ang) * V_MAX * 0.55;            // soft release — drifts back out
             s.vy = Math.sin(T.ang) * V_MAX * 0.55;
             s.tether = null;
+            s.cooldown = 2.5 + Math.random() * 2.5;           // rest before it can be tethered again
           }
           continue;
         }
@@ -431,8 +510,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // move
         s.x += s.vx * dt;
         s.y += s.vy * dt;
-        // bounce off the name zone (inner) and the outer edge
+        // ── distance-driven tether: a symbol that drifts too far gets its OWN thread ──
+        s.cooldown -= dt;
         let d = Math.hypot(s.x, s.y) || 0.001;
+        if (s.cooldown <= 0 && d > rMax * 0.84) {
+          s.tether = { t: 0, ang: Math.atan2(s.y, s.x), startR: d };
+          continue;   // tether takes over from next frame
+        }
+        // bounce off the name zone (inner) and the outer edge
         if (d > rMax) {
           const nx = s.x / d, ny = s.y / d, dot = s.vx * nx + s.vy * ny;
           s.x = nx * rMax; s.y = ny * rMax;
@@ -471,17 +556,8 @@ document.addEventListener('DOMContentLoaded', () => {
         s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)${extra}`;
       }
 
-      // ── Occasionally tether a far, free symbol back toward the core ──
-      tetherTimer -= dt;
-      if (tetherTimer <= 0) {
-        const far = st.filter(s => !s.tether && !s.frozen && Math.hypot(s.x, s.y) > rMax * 0.72);
-        const count = (far.length > 3 && Math.random() < 0.45) ? 2 : 1;   // sometimes grab two
-        for (let n = 0; n < count && far.length; n++) {
-          const s = far.splice((Math.random() * far.length) | 0, 1)[0];
-          s.tether = { t: 0, ang: Math.atan2(s.y, s.x), startR: Math.hypot(s.x, s.y) };
-        }
-        tetherTimer = 2.2 + Math.random() * 2.4;          // calm, elegant frequency
-      }
+      // (Tethering is now distance-driven per symbol — see the movement loop above.)
+      botUpdate(dt);
 
       // ── Draw organic spider-silk threads (core → tethered symbols) ──
       if (wctx) {
@@ -495,40 +571,23 @@ document.addEventListener('DOMContentLoaded', () => {
           if (T.t < 0.45) { reach = T.t / 0.45; alpha = 0.55 * reach; }        // silk extends out
           else if (T.t > total - 0.5) alpha = 0.55 * Math.max(0, 1 - (T.t - (total - 0.5)) / 0.5);  // fades on release
           const tx = cx + s.x * reach, ty = cy + s.y * reach;
-          const dx = tx - cx, dy = ty - cy;
+          const dx = tx - cx, dy = ty - cy, len = Math.hypot(dx, dy) || 1;
           const base = Math.atan2(dy, dx);
-          const gripR = ICON_HALF * 0.95 * Math.min(1, reach / 0.7);  // spread onto the symbol as it reaches
-          const STRANDS = 5;
-
-          // Helper: one sagging silk strand from the core to a point
-          function silk(ex, ey, width, a) {
-            const ddx = ex - cx, ddy = ey - cy, dl = Math.hypot(ddx, ddy) || 1;
-            let qx = -ddy / dl, qy = ddx / dl;
-            if (qy < 0) { qx = -qx; qy = -qy; }                 // droop downward
-            const sg = Math.min(dl * 0.12, 20);
-            wctx.beginPath();
-            wctx.moveTo(cx, cy);
-            for (let i = 1; i <= 16; i++) {
-              const f = i / 16;
-              const dr = Math.sin(f * Math.PI) * sg;
-              wctx.lineTo(cx + ddx * f + qx * dr, cy + ddy * f + qy * dr);
-            }
-            wctx.strokeStyle = 'rgba(216,221,250,' + a + ')';
-            wctx.lineWidth = width;
-            wctx.stroke();
-          }
-
-          // Multiple silk threads fanning from the core onto the symbol's near side
+          // one sagging silk strand from the core to this symbol
+          let px = -dy / len, py = dx / len;
+          if (py < 0) { px = -px; py = -py; }                  // droop downward
+          const sag = Math.min(len * 0.12, 20);
           wctx.shadowBlur = 3; wctx.shadowColor = 'rgba(190,180,255,0.3)';
-          const mid = (STRANDS - 1) / 2;
-          for (let k = 0; k < STRANDS; k++) {
-            const off = k - mid;                                // -2 .. 2
-            const pa = base + off * 0.42;
-            const ex = tx - Math.cos(pa) * gripR;
-            const ey = ty - Math.sin(pa) * gripR;
-            const central = Math.abs(off) < 0.6;
-            silk(ex, ey, central ? 1.0 : 0.7, alpha * (central ? 0.9 : 0.45));
+          wctx.beginPath();
+          wctx.moveTo(cx, cy);
+          for (let i = 1; i <= 16; i++) {
+            const f = i / 16;
+            const dr = Math.sin(f * Math.PI) * sag;
+            wctx.lineTo(cx + dx * f + px * dr, cy + dy * f + py * dr);
           }
+          wctx.strokeStyle = 'rgba(216,221,250,' + alpha + ')';
+          wctx.lineWidth = 1.0;
+          wctx.stroke();
           wctx.shadowBlur = 0;
 
           // silk wrapping the hooked symbol (only when fully reached)
@@ -542,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
         }
+        botDraw(wctx);
       }
 
       requestAnimationFrame(frame);
