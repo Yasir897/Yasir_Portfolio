@@ -151,12 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (entry.isIntersecting) {
         el.style.transitionDelay = el.style.getPropertyValue('--delay') || '0ms';
         el.classList.add('visible');
+        el.classList.remove('leaving-up');
       } else {
         el.style.transitionDelay = '0ms';
-        el.classList.remove('visible');   // leaving view → animate back out
+        el.classList.remove('visible');
+        // left via the TOP (still near the top, visible) → fade upward;
+        // otherwise it's still below, waiting to enter → reset to the "below" state
+        el.classList.toggle('leaving-up', entry.boundingClientRect.top < window.innerHeight * 0.5);
       }
     });
-  }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+  }, { threshold: 0.05, rootMargin: '-12% 0px -12% 0px' });
 
   revealEls.forEach(el => revealObserver.observe(el));
 
@@ -233,24 +237,28 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ─── TEXT SCRAMBLE on section titles ─── */
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$';
   function scramble(el) {
-    const original = el.textContent;
+    if (el._scrambleId) clearInterval(el._scrambleId);
+    const original = el.dataset.text || (el.dataset.text = el.textContent);
     let iter = 0;
-    const id = setInterval(() => {
+    el._scrambleId = setInterval(() => {
       el.textContent = original.split('').map((ch, i) => {
         if (ch === ' ') return ' ';
         if (i < iter) return original[i];
         return CHARS[Math.floor(Math.random() * CHARS.length)];
       }).join('');
-      iter += 0.4;
-      if (iter >= original.length) { el.textContent = original; clearInterval(id); }
-    }, 28);
+      iter += 0.22;                                   // slower reveal → clearly noticeable
+      if (iter >= original.length) { el.textContent = original; clearInterval(el._scrambleId); el._scrambleId = null; }
+    }, 45);                                           // slower tick
   }
   const scrambleTitles = document.querySelectorAll('.scramble-title');
   const scrambleObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        scramble(entry.target);
-        scrambleObserver.unobserve(entry.target);
+      const el = entry.target;
+      if (entry.isIntersecting && !el._scrambled) {
+        el._scrambled = true;
+        scramble(el);
+      } else if (!entry.isIntersecting) {
+        el._scrambled = false;                        // re-scramble next time it scrolls into view
       }
     });
   }, { threshold: 0.6 });

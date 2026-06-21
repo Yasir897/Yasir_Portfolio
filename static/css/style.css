@@ -1285,6 +1285,12 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   opacity: 1;
   transform: translate(0);
 }
+/* Leaving via the top → fade upward (smooth, premium exit) */
+.reveal-up.leaving-up, .reveal-fade.leaving-up,
+.reveal-left.leaving-up, .reveal-right.leaving-up {
+  opacity: 0;
+  transform: translateY(-44px);
+}
 
 /* ============================
    SCROLLBAR
