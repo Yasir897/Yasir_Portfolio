@@ -1273,12 +1273,13 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
    ============================ */
 .reveal-up, .reveal-fade, .reveal-left, .reveal-right {
   opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  will-change: opacity, transform;
 }
-.reveal-up { transform: translateY(40px); }
+.reveal-up { transform: translateY(34px); }
 .reveal-fade { transform: translateY(10px); }
-.reveal-left { transform: translateX(-40px); }
-.reveal-right { transform: translateX(40px); }
+.reveal-left { transform: translateX(-34px); }
+.reveal-right { transform: translateX(34px); }
 
 .reveal-up.visible, .reveal-fade.visible, .reveal-left.visible, .reveal-right.visible {
   opacity: 1;

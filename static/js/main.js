@@ -111,19 +111,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('.nav-link');
 
-  function highlightNavLink() {
-    const scrollY = window.scrollY;
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop - 100;
-      const sectionHeight = section.offsetHeight;
-      if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-        navLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === '#' + section.id) link.classList.add('active');
-        });
+  // Active nav link via IntersectionObserver (no per-scroll layout reads → no jank)
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = '#' + entry.target.id;
+        navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === id));
       }
     });
-  }
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  sections.forEach(s => navObserver.observe(s));
 
   /* ─── TYPED TEXT ─── */
   const typedEl = document.getElementById('typedText');
@@ -146,19 +143,20 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(type, 1600);
   }
 
-  /* ─── SCROLL REVEAL ─── */
+  /* ─── SCROLL REVEAL (bidirectional: animate in AND out) ─── */
   const revealEls = document.querySelectorAll('.reveal-up, .reveal-fade, .reveal-left, .reveal-right');
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
+      const el = entry.target;
       if (entry.isIntersecting) {
-        const delay = entry.target.style.getPropertyValue('--delay') || '0ms';
-        setTimeout(() => {
-          entry.target.classList.add('visible');
-        }, parseInt(delay) || 0);
-        revealObserver.unobserve(entry.target);
+        el.style.transitionDelay = el.style.getPropertyValue('--delay') || '0ms';
+        el.classList.add('visible');
+      } else {
+        el.style.transitionDelay = '0ms';
+        el.classList.remove('visible');   // leaving view → animate back out
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
 
   revealEls.forEach(el => revealObserver.observe(el));
 
@@ -210,29 +208,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: [0, 0.5, 1] });
   lightSects.forEach(s => cursorObserver.observe(s));
 
-  /* ─── CONSOLIDATED SCROLL HANDLER (rAF-throttled → no scroll jank) ─── */
+  /* ─── CONSOLIDATED SCROLL HANDLER (rAF-throttled, zero layout reads) ─── */
   const decoCircles = document.querySelectorAll('.deco-circle');
   const progressBarEl = document.getElementById('scroll-progress');
+  let maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  const recalcMax = () => { maxScroll = document.documentElement.scrollHeight - window.innerHeight; };
+  window.addEventListener('resize', recalcMax);
+  window.addEventListener('load', recalcMax);
   let scrollTick = false;
   function onScrollFrame() {
     scrollTick = false;
-    const sy = window.scrollY;
+    const sy = window.scrollY;                 // cheap, no layout
     navbar.classList.toggle('scrolled', sy > 50);
-    if (progressBarEl) {
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - doc.clientHeight;
-      progressBarEl.style.transform = `scaleX(${max > 0 ? sy / max : 0})`;
-    }
-    highlightNavLink();
+    if (progressBarEl) progressBarEl.style.transform = `scaleX(${maxScroll > 0 ? sy / maxScroll : 0})`;
     for (const el of decoCircles) {
       el.style.transform = `translateY(${sy * 0.08}px) rotate(${sy * 0.02}deg)`;
     }
-    let anyLight = false;
-    lightSects.forEach(s => {
-      const r = s.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.5 && r.bottom > window.innerHeight * 0.5) anyLight = true;
-    });
-    document.body.classList.toggle('cursor-light', anyLight);
   }
   window.addEventListener('scroll', () => {
     if (!scrollTick) { scrollTick = true; requestAnimationFrame(onScrollFrame); }
@@ -291,22 +282,9 @@ document.addEventListener('DOMContentLoaded', () => {
     card.addEventListener('mouseleave', () => { card.style.transform = ''; });
   });
 
-  /* ─── AURORA BLOBS REACT TO MOUSE ─── */
-  const blobs = document.querySelectorAll('.aurora-blob');
-  let blobRX = 0, blobRY = 0;
-  document.addEventListener('mousemove', e => {
-    blobRX = (e.clientX / window.innerWidth - 0.5);
-    blobRY = (e.clientY / window.innerHeight - 0.5);
-  });
-  function driftBlobs() {
-    blobs.forEach((b, i) => {
-      const depth = (i + 1) * 14;
-      b.style.marginLeft = (blobRX * depth) + 'px';
-      b.style.marginTop = (blobRY * depth) + 'px';
-    });
-    requestAnimationFrame(driftBlobs);
-  }
-  driftBlobs();
+  /* (Removed per-frame aurora-blob margin drift — it forced a full layout
+     reflow every frame on big blurred elements and caused scroll jank.
+     The blobs still animate smoothly via their CSS transform keyframes.) */
 
   /* ─── PARALLAX is handled by the consolidated scroll handler above ─── */
 
@@ -545,8 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
       w = window.innerWidth; h = window.innerHeight;
       c.width = w * dpr; c.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // adaptive node count → light enough to stay smooth while scrolling
-      const N = Math.max(34, Math.min(80, Math.floor(w * h / 18000)));
+      // adaptive node count → kept low so frames stay light while scrolling
+      const N = Math.max(26, Math.min(52, Math.floor(w * h / 28000)));
       nodes = [];
       for (let i = 0; i < N; i++) {
         nodes.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .26, vy: (Math.random() - .5) * .26 });
