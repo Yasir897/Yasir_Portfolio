@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% if bio %}{{ bio.name }}{% else %}Portfolio{% endif %} | Portfolio</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=13" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=14" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -135,7 +135,7 @@
       <!-- Glowing nucleus + name (protected center) -->
       <div class="orbit-core">
         <div class="orbit-nucleus"></div>
-        <h3 class="orbit-name">{% if bio %}{{ bio.name }}{% else %}Yasir Naeem{% endif %}</h3>
+        <h3 class="orbit-name">{% if bio %}{% for w in bio.name.split %}<span>{{ w }}</span>{% endfor %}{% else %}<span>Yasir</span><span>Naeem</span>{% endif %}</h3>
       </div>
 
       <!-- Floating, clickable tech logos (positioned & animated by JS) -->
@@ -458,7 +458,7 @@
     <p class="footer-tech">Django &bull; Python &bull; CSS &bull; JavaScript</p>
   </footer>
 
-  <script src="{% static 'js/main.js' %}?v=13"></script>
+  <script src="{% static 'js/main.js' %}?v=14"></script>
   <script>
     const typedRoles = [
       "{% if bio %}{{ bio.job_title }}{% else %}Full Stack Developer{% endif %}",

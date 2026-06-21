@@ -1378,6 +1378,7 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   align-items: center;
   justify-content: center;
   z-index: 5;
+  pointer-events: none;   /* let clicks pass through to the symbols beneath */
 }
 .orbit-nucleus {
   position: absolute;
@@ -1399,7 +1400,7 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   font-weight: 700;
   letter-spacing: -0.01em;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.05;
   max-width: 40%;
   background: var(--grad-soft);
   -webkit-background-clip: text;
@@ -1407,6 +1408,8 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
 }
+/* Stack the name — "Yasir" on top, "Naeem" below */
+.orbit-name span { display: block; }
 
 /* Floating logo chips — positioned & drifted by JS (no rigid rotation) */
 .orbit-icon {

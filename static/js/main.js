@@ -380,84 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return s;
     });
 
-    // ── Cute spider-bot that lives among the symbols ──
-    const bot = {
-      x: cssSize * 0.5, y: cssSize * 0.22, tx: cssSize * 0.5, ty: cssSize * 0.3,
-      state: 'wander', stT: 0, legT: 0, anchor: null, swing: 0.6, swingV: 0, thread: 0
-    };
-    function botWander() {
-      const R = radius(), a = Math.random() * Math.PI * 2, rr = R * (0.45 + Math.random() * 0.5);
-      bot.tx = cssSize / 2 + Math.cos(a) * rr;
-      bot.ty = cssSize / 2 + Math.sin(a) * rr;
-    }
-    function botUpdate(dt) {
-      bot.stT += dt;
-      const cx = cssSize / 2, cy = cssSize / 2;
-      const moving = Math.hypot(bot.tx - bot.x, bot.ty - bot.y) > 4;
-      bot.legT += dt * (moving ? 9 : 3);
-      if (bot.state === 'swing') {
-        bot.thread = Math.min(1, bot.thread + dt * 2.5);
-        bot.swingV += -Math.sin(bot.swing) * 6 * dt;     // pendulum
-        bot.swingV *= 0.992;
-        bot.swing += bot.swingV * dt;
-        const ax = cx + (bot.anchor ? bot.anchor.x : 0), ay = cy + (bot.anchor ? bot.anchor.y : 0);
-        const L = 36;
-        bot.x = ax + Math.sin(bot.swing) * L;
-        bot.y = ay + Math.abs(Math.cos(bot.swing)) * L;
-        if (bot.stT > 3.4) { bot.stT = 0; bot.state = 'wander'; botWander(); }
-        return;
-      }
-      // wander / rest both ease toward target
-      bot.x += (bot.tx - bot.x) * Math.min(1, dt * 1.6);
-      bot.y += (bot.ty - bot.y) * Math.min(1, dt * 1.6);
-      const done = !moving || bot.stT > (bot.state === 'rest' ? 4.5 : 3.8);
-      if (done) {
-        bot.stT = 0;
-        const r = Math.random();
-        if (r < 0.4 && st.length) {                       // swing on a symbol
-          bot.anchor = st[(Math.random() * st.length) | 0];
-          bot.swing = (Math.random() - 0.5) * 0.9; bot.swingV = (Math.random() - 0.5) * 2.4;
-          bot.thread = 0; bot.state = 'swing';
-        } else if (r < 0.68) {                            // perch just above the name
-          bot.state = 'rest';
-          bot.tx = cx + (Math.random() - 0.5) * cssSize * 0.22;
-          bot.ty = cy - cssSize * 0.085;
-        } else {                                          // keep wandering
-          bot.state = 'wander'; botWander();
-        }
-      }
-    }
-    function botDraw(g) {
-      const cx = cssSize / 2, cy = cssSize / 2, bx = bot.x, by = bot.y;
-      if (bot.state === 'swing' && bot.anchor) {          // silk it hangs from
-        g.strokeStyle = 'rgba(216,221,250,0.5)'; g.lineWidth = 1;
-        g.beginPath(); g.moveTo(cx + bot.anchor.x, cy + bot.anchor.y); g.lineTo(bx, by); g.stroke();
-      }
-      g.lineCap = 'round';
-      g.strokeStyle = 'rgba(200,170,255,0.9)'; g.lineWidth = 1.4;
-      for (let i = 0; i < 8; i++) {                        // 8 legs with gentle twitch
-        const side = i < 4 ? 1 : -1;
-        const a = side * (0.7 + (i % 4) * 0.45) + Math.sin(bot.legT + i) * 0.12;
-        const kx = bx + Math.cos(a) * 6, ky = by + Math.abs(Math.sin(a)) * 5 - 1;
-        const fx = bx + Math.cos(a) * 11, fy = by + Math.abs(Math.sin(a)) * 9 + 3 + Math.sin(bot.legT + i) * 1.2;
-        g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(kx, ky, fx, fy); g.stroke();
-      }
-      g.save();                                            // round glowing body
-      g.shadowColor = 'rgba(168,85,247,0.8)'; g.shadowBlur = 10;
-      const grad = g.createRadialGradient(bx, by, 1, bx, by, 9);
-      grad.addColorStop(0, '#f0abfc'); grad.addColorStop(1, '#7c3aed');
-      g.fillStyle = grad;
-      g.beginPath(); g.arc(bx, by, 7, 0, 6.2832); g.fill();
-      g.restore();
-      g.fillStyle = '#fff';                                // cute big eyes
-      g.beginPath(); g.arc(bx - 2.4, by - 1.2, 2.2, 0, 6.2832); g.fill();
-      g.beginPath(); g.arc(bx + 2.4, by - 1.2, 2.2, 0, 6.2832); g.fill();
-      g.fillStyle = '#0b0b14';
-      g.beginPath(); g.arc(bx - 2.1, by - 1.0, 1.0, 0, 6.2832); g.fill();
-      g.beginPath(); g.arc(bx + 2.7, by - 1.0, 1.0, 0, 6.2832); g.fill();
-    }
-    botWander();
-
     let last = performance.now();
     function frame(now) {
       let dt = (now - last) / 1000;
@@ -557,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // (Tethering is now distance-driven per symbol — see the movement loop above.)
-      botUpdate(dt);
 
       // ── Draw organic spider-silk threads (core → tethered symbols) ──
       if (wctx) {
@@ -601,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
         }
-        botDraw(wctx);
       }
 
       requestAnimationFrame(frame);
