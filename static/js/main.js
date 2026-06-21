@@ -85,101 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ─── PARTICLE CANVAS ─── */
-  const canvas = document.getElementById('particle-canvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-  let W, H;
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Aurora particle palette
-  const AURORA_COLORS = ['168,85,247', '34,211,238', '236,72,153', '124,58,237', '59,130,246'];
-
-  class Particle {
-    constructor() { this.reset(); }
-    reset() {
-      this.x = Math.random() * W;
-      this.y = Math.random() * H;
-      this.size = Math.random() * 1.6 + 0.4;
-      this.speedX = (Math.random() - 0.5) * 0.4;
-      this.speedY = (Math.random() - 0.5) * 0.4;
-      this.opacity = Math.random() * 0.6 + 0.15;
-      this.color = AURORA_COLORS[Math.floor(Math.random() * AURORA_COLORS.length)];
-      this.life = 0;
-      this.maxLife = Math.random() * 200 + 100;
-    }
-    update() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-      this.life++;
-      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H || this.life > this.maxLife) this.reset();
-    }
-    draw() {
-      ctx.save();
-      ctx.globalAlpha = this.opacity * (1 - this.life / this.maxLife);
-      ctx.fillStyle = `rgb(${this.color})`;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = `rgb(${this.color})`;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  for (let i = 0; i < 120; i++) particles.push(new Particle());
-
-  // Web threads connect to the SPIDER's body (not the cursor dot).
-  // initSpider() updates this every frame.
-  const spiderPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-
-  function drawConnections() {
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 110) {
-          ctx.save();
-          ctx.globalAlpha = (1 - dist / 110) * 0.14;
-          ctx.strokeStyle = `rgb(${particles[i].color})`;
-          ctx.lineWidth = 0.6;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-      const dx = particles[i].x - spiderPos.x;
-      const dy = particles[i].y - spiderPos.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 170) {
-        ctx.save();
-        ctx.globalAlpha = (1 - dist / 170) * 0.4;
-        ctx.strokeStyle = `rgb(${particles[i].color})`;
-        ctx.lineWidth = 0.7;
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(spiderPos.x, spiderPos.y);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-  }
-
-  function animateParticles() {
-    ctx.clearRect(0, 0, W, H);
-    drawConnections();
-    particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(animateParticles);
-  }
-  animateParticles();
+  // The animated web + silk threads + spider now live in ONE lightweight
+  // canvas (see "BACKGROUND SPIDER" below) — this keeps scrolling smooth.
+  // The old heavy particle field (120 dots + per-dot shadow + double web)
+  // was removed because it caused jank while scrolling.
 
   /* ─── NAVBAR SCROLL ─── */
   const navbar = document.getElementById('navbar');
@@ -501,111 +410,124 @@ document.addEventListener('DOMContentLoaded', () => {
     updateProgress();
   }
 
-  /* ─── BACKGROUND SPIDER (follows the cursor) ─── */
+  /* ─── BACKGROUND WEB + SPIDER (single lightweight canvas) ─── */
   (function initSpider() {
     const c = document.getElementById('spider-canvas');
     if (!c) return;
-    const x = c.getContext('2d');
-    let W, H;
-    function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
-    resize();
-    window.addEventListener('resize', resize);
+    const ctx = c.getContext('2d');
+    const ACC = '168,85,247';            // aurora purple
+    let w = 0, h = 0, dpr = 1, nodes = [];
 
-    let mx = window.innerWidth / 2, my = window.innerHeight * 0.4;
-    window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-
-    const body = { x: mx, y: my, heading: 0 };
-    const REACH = 68, STEP_THRESH = 40, TURN = 0.12, MAX_SPEED = 5;
-
-    // 8 legs — 4 each side, spread around the body's perpendicular
-    const legs = [];
-    [-1, 1].forEach(side => {
-      [0.55, 0.2, -0.2, -0.55].forEach(spread => {
-        legs.push({ side, spread, foot: { x: body.x, y: body.y }, stepping: false });
-      });
-    });
-
-    function frame() {
-      // Turn toward the cursor first, then walk forward along the heading
-      // (so it scuttles like a spider instead of gliding/flying sideways).
-      const dx = mx - body.x, dy = my - body.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 6) {
-        const desired = Math.atan2(dy, dx);
-        let diff = desired - body.heading;
-        diff = Math.atan2(Math.sin(diff), Math.cos(diff));  // normalise to -PI..PI
-        body.heading += diff * TURN;                         // rotate gradually
-        const speed = Math.min(dist * 0.05, MAX_SPEED);
-        body.x += Math.cos(body.heading) * speed;
-        body.y += Math.sin(body.heading) * speed;
+    function build() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      c.width = w * dpr; c.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // adaptive node count → light enough to stay smooth while scrolling
+      const N = Math.max(34, Math.min(80, Math.floor(w * h / 18000)));
+      nodes = [];
+      for (let i = 0; i < N; i++) {
+        nodes.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .26, vy: (Math.random() - .5) * .26 });
       }
-      // share the spider's position so the web threads attach to it
-      spiderPos.x = body.x;
-      spiderPos.y = body.y;
-      const hd = body.heading;
-
-      x.clearRect(0, 0, W, H);
-
-      // legs
-      for (const leg of legs) {
-        const perp = hd + (Math.PI / 2) * leg.side;
-        const sx = body.x + Math.cos(perp) * 7;
-        const sy = body.y + Math.sin(perp) * 7;
-        const footAngle = hd + leg.side * (Math.PI / 2) + leg.spread;
-        const ix = body.x + Math.cos(footAngle) * REACH;
-        const iy = body.y + Math.sin(footAngle) * REACH;
-
-        if (Math.hypot(leg.foot.x - ix, leg.foot.y - iy) > STEP_THRESH) leg.stepping = true;
-        if (leg.stepping) {
-          leg.foot.x += (ix - leg.foot.x) * 0.3;
-          leg.foot.y += (iy - leg.foot.y) * 0.3;
-          if (Math.hypot(leg.foot.x - ix, leg.foot.y - iy) < 4) leg.stepping = false;
-        }
-
-        // bent knee (lift perpendicular to the leg line)
-        const midx = (sx + leg.foot.x) / 2, midy = (sy + leg.foot.y) / 2;
-        const lAng = Math.atan2(leg.foot.y - sy, leg.foot.x - sx);
-        const lift = leg.stepping ? 26 : 14;   // raise the knee while taking a step
-        const knx = midx + Math.cos(lAng - (Math.PI / 2) * leg.side) * lift;
-        const kny = midy + Math.sin(lAng - (Math.PI / 2) * leg.side) * lift;
-
-        x.beginPath();
-        x.moveTo(sx, sy);
-        x.quadraticCurveTo(knx, kny, leg.foot.x, leg.foot.y);
-        x.strokeStyle = 'rgba(168, 85, 247, 0.5)';
-        x.lineWidth = 1.8;
-        x.shadowBlur = 8;
-        x.shadowColor = 'rgba(168, 85, 247, 0.6)';
-        x.stroke();
-
-        x.beginPath();
-        x.arc(leg.foot.x, leg.foot.y, 2, 0, Math.PI * 2);
-        x.fillStyle = 'rgba(34, 211, 238, 0.7)';
-        x.fill();
-      }
-
-      // abdomen
-      const ax = body.x - Math.cos(hd) * 11, ay = body.y - Math.sin(hd) * 11;
-      x.shadowBlur = 18; x.shadowColor = 'rgba(168, 85, 247, 0.8)';
-      const g = x.createRadialGradient(ax, ay, 1, ax, ay, 13);
-      g.addColorStop(0, 'rgba(236, 72, 153, 0.9)');
-      g.addColorStop(1, 'rgba(124, 58, 237, 0.65)');
-      x.beginPath();
-      x.ellipse(ax, ay, 12, 9.5, hd, 0, Math.PI * 2);
-      x.fillStyle = g;
-      x.fill();
-
-      // head
-      const hx = body.x + Math.cos(hd) * 6, hy = body.y + Math.sin(hd) * 6;
-      x.beginPath();
-      x.arc(hx, hy, 6, 0, Math.PI * 2);
-      x.fillStyle = 'rgba(34, 211, 238, 0.9)';
-      x.fill();
-      x.shadowBlur = 0;
-
-      requestAnimationFrame(frame);
     }
-    frame();
+    build();
+    window.addEventListener('resize', build);
+
+    const mouse = { x: w / 2, y: h / 2, has: false };
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.has = true; }, { passive: true });
+
+    const spider = { x: w / 2, y: h / 2 };
+    const feet = []; for (let i = 0; i < 8; i++) feet.push({ x: w / 2, y: h / 2 });
+    let heading = 0, t = 0;
+
+    function drawSpider() {
+      const sideAngles = [0.95, 1.4, 1.95, 2.45];
+      ctx.lineCap = 'round';
+      for (let i = 0; i < 8; i++) {
+        const side = i < 4 ? 1 : -1;
+        const a = heading + side * sideAngles[i % 4];
+        const reach = 30 + Math.sin(t * 0.12 + i * 1.3) * 4;
+        const txp = spider.x + Math.cos(a) * reach;
+        const typ = spider.y + Math.sin(a) * reach;
+        const f = feet[i];
+        f.x += (txp - f.x) * 0.28; f.y += (typ - f.y) * 0.28;
+        const shx = spider.x + Math.cos(a) * 4, shy = spider.y + Math.sin(a) * 4;
+        const mxp = (shx + f.x) / 2 + Math.cos(a) * 6;
+        const myp = (shy + f.y) / 2 + Math.sin(a) * 6 - 5;
+        ctx.strokeStyle = 'rgba(' + ACC + ',0.8)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(shx, shy); ctx.quadraticCurveTo(mxp, myp, f.x, f.y); ctx.stroke();
+        ctx.fillStyle = 'rgba(34,211,238,0.85)';
+        ctx.beginPath(); ctx.arc(f.x, f.y, 1.4, 0, 6.2832); ctx.fill();
+      }
+      // abdomen
+      const bx = spider.x - Math.cos(heading) * 6, by = spider.y - Math.sin(heading) * 6;
+      ctx.save();
+      ctx.shadowColor = 'rgba(' + ACC + ',0.7)'; ctx.shadowBlur = 14;
+      const g = ctx.createRadialGradient(bx, by, 1, bx, by, 9);
+      g.addColorStop(0, 'rgba(236,72,153,0.95)');
+      g.addColorStop(1, 'rgba(124,58,237,0.85)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.ellipse(bx, by, 7, 8.5, heading, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = 'rgba(' + ACC + ',0.95)'; ctx.lineWidth = 1.3; ctx.stroke();
+      // head
+      const fx = spider.x + Math.cos(heading) * 4, fy = spider.y + Math.sin(heading) * 4;
+      ctx.fillStyle = 'rgba(34,211,238,0.9)';
+      ctx.beginPath(); ctx.ellipse(fx, fy, 4, 4, heading, 0, 6.2832); ctx.fill();
+      ctx.restore();
+    }
+
+    function draw() {
+      t++;
+      ctx.clearRect(0, 0, w, h);
+      let tx = mouse.x, ty = mouse.y;
+      if (!mouse.has) { tx = w * 0.5 + Math.cos(t * 0.005) * w * 0.28; ty = h * 0.45 + Math.sin(t * 0.007) * h * 0.22; }
+
+      // drift nodes
+      for (const p of nodes) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+      }
+      // faint background web (node ↔ node)
+      ctx.lineWidth = 1;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+          if (d < 120) {
+            ctx.strokeStyle = 'rgba(200,190,255,' + (0.05 * (1 - d / 120)) + ')';
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      for (const p of nodes) {
+        ctx.fillStyle = 'rgba(200,190,255,0.2)';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 1.2, 0, 6.2832); ctx.fill();
+      }
+
+      // spider follows the cursor with a fast lerp → keeps up, no lag
+      spider.x += (tx - spider.x) * 0.12;
+      spider.y += (ty - spider.y) * 0.12;
+      let diff = Math.atan2(ty - spider.y, tx - spider.x) - heading;
+      while (diff > Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+      heading += diff * 0.1;
+
+      // silk threads from the SPIDER to nearby nodes
+      const R = 210;
+      for (const p of nodes) {
+        const dx = p.x - spider.x, dy = p.y - spider.y, d = Math.hypot(dx, dy);
+        if (d < R) {
+          ctx.strokeStyle = 'rgba(' + ACC + ',' + (0.5 * (1 - d / R)) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(spider.x, spider.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+        }
+      }
+      drawSpider();
+      requestAnimationFrame(draw);
+    }
+    draw();
   })();
 
   /* ─── GLITCH EFFECT ON HERO NAME ─── */
