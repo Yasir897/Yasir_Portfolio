@@ -134,11 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   for (let i = 0; i < 120; i++) particles.push(new Particle());
 
-  let mouseParticleX = -1000, mouseParticleY = -1000;
-  window.addEventListener('mousemove', e => {
-    mouseParticleX = e.clientX;
-    mouseParticleY = e.clientY;
-  });
+  // Web threads connect to the SPIDER's body (not the cursor dot).
+  // initSpider() updates this every frame.
+  const spiderPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
   function drawConnections() {
     for (let i = 0; i < particles.length; i++) {
@@ -158,17 +156,17 @@ document.addEventListener('DOMContentLoaded', () => {
           ctx.restore();
         }
       }
-      const dx = particles[i].x - mouseParticleX;
-      const dy = particles[i].y - mouseParticleY;
+      const dx = particles[i].x - spiderPos.x;
+      const dy = particles[i].y - spiderPos.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 160) {
+      if (dist < 170) {
         ctx.save();
-        ctx.globalAlpha = (1 - dist / 160) * 0.35;
+        ctx.globalAlpha = (1 - dist / 170) * 0.4;
         ctx.strokeStyle = `rgb(${particles[i].color})`;
         ctx.lineWidth = 0.7;
         ctx.beginPath();
         ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(mouseParticleX, mouseParticleY);
+        ctx.lineTo(spiderPos.x, spiderPos.y);
         ctx.stroke();
         ctx.restore();
       }
@@ -541,6 +539,9 @@ document.addEventListener('DOMContentLoaded', () => {
         body.x += Math.cos(body.heading) * speed;
         body.y += Math.sin(body.heading) * speed;
       }
+      // share the spider's position so the web threads attach to it
+      spiderPos.x = body.x;
+      spiderPos.y = body.y;
       const hd = body.heading;
 
       x.clearRect(0, 0, W, H);
