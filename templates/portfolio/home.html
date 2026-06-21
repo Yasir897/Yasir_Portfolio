@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% if bio %}{{ bio.name }}{% else %}Portfolio{% endif %} | Portfolio</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=9" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=10" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -129,6 +129,9 @@
     </div>
     <div class="orbit-system reveal-fade">
 
+      <!-- Web threads drawn here (core → symbols) -->
+      <canvas class="orbit-web" aria-hidden="true"></canvas>
+
       <!-- Glowing nucleus + name (protected center) -->
       <div class="orbit-core">
         <div class="orbit-nucleus"></div>
@@ -159,6 +162,18 @@
       </a>
       <a class="orbit-icon" href="https://developer.mozilla.org/en-US/docs/Web/CSS" target="_blank" rel="noopener" title="CSS3">
         <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS3" loading="lazy" />
+      </a>
+      <a class="orbit-icon" href="https://nodejs.org" target="_blank" rel="noopener" title="Node.js">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" alt="Node.js" loading="lazy" />
+      </a>
+      <a class="orbit-icon" href="https://www.typescriptlang.org" target="_blank" rel="noopener" title="TypeScript">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg" alt="TypeScript" loading="lazy" />
+      </a>
+      <a class="orbit-icon" href="https://getbootstrap.com" target="_blank" rel="noopener" title="Bootstrap">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg" alt="Bootstrap" loading="lazy" />
+      </a>
+      <a class="orbit-icon" href="https://www.linux.org" target="_blank" rel="noopener" title="Linux">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" alt="Linux" loading="lazy" />
       </a>
 
     </div>
@@ -443,7 +458,7 @@
     <p class="footer-tech">Django &bull; Python &bull; CSS &bull; JavaScript</p>
   </footer>
 
-  <script src="{% static 'js/main.js' %}?v=9"></script>
+  <script src="{% static 'js/main.js' %}?v=10"></script>
   <script>
     const typedRoles = [
       "{% if bio %}{{ bio.job_title }}{% else %}Full Stack Developer{% endif %}",

@@ -1357,9 +1357,17 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
 
 .orbit-system {
   position: relative;
-  width: min(86vw, 560px);
+  width: min(92vw, 640px);
   aspect-ratio: 1 / 1;
   margin: 1.5rem auto 0;
+}
+/* Canvas where the core→symbol web threads are drawn */
+.orbit-web {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* Glowing nucleus + name */
@@ -1404,14 +1412,14 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
 .orbit-icon {
   position: absolute;
   top: 50%; left: 50%;
-  width: 52px; height: 52px;
+  width: 44px; height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 22px rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   transform: translate(-50%, -50%);
   will-change: transform;
 }
@@ -1422,15 +1430,15 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   box-shadow: 0 0 30px rgba(168, 85, 247, 0.85);
 }
 .oi-logo {
-  width: 30px; height: 30px;
+  width: 26px; height: 26px;
   display: block;
   pointer-events: none;
 }
 
 @media (max-width: 600px) {
-  .orbit-system { width: 92vw; }
-  .orbit-icon { width: 44px; height: 44px; }
-  .oi-logo { width: 26px; height: 26px; }
+  .orbit-system { width: 94vw; }
+  .orbit-icon { width: 38px; height: 38px; }
+  .oi-logo { width: 22px; height: 22px; }
 }
 
 /* Reduced motion */

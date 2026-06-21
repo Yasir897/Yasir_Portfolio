@@ -328,26 +328,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const icons = Array.from(system.querySelectorAll('.orbit-icon'));
     if (!icons.length) return;
 
-    const ICON_HALF = 26;       // half chip size (px)
-    const R_MIN = 0.55;         // keep clear of the name (fraction of system radius)
-    const R_MAX = 0.92;         // stay inside the system
-    const MIN_DIST = 66;        // min centre-to-centre between logos (no overlap)
-    const V_MIN = 16, V_MAX = 46;   // px/s speed bounds (always moving)
+    const ICON_HALF = 22;       // half chip size (px)
+    const R_MIN = 0.66;         // keep symbols farther from the name
+    const R_MAX = 0.96;         // stay inside the system
+    const MIN_DIST = 56;        // min centre-to-centre between logos (no overlap)
+    const V_MIN = 14, V_MAX = 42;   // px/s speed bounds (always moving)
 
     function radius() {
       const w = system.offsetWidth;
-      return (w && w > 0 ? w : Math.min(window.innerWidth * 0.86, 560)) / 2;
+      return (w && w > 0 ? w : Math.min(window.innerWidth * 0.92, 640)) / 2;
     }
+
+    // ── Web-thread canvas (core "Yasir Naeem" → far symbols) ──
+    const web = system.querySelector('.orbit-web');
+    const wctx = web ? web.getContext('2d') : null;
+    let cssSize = system.offsetWidth || 600;
+    function sizeWeb() {
+      if (!web) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cssSize = system.offsetWidth || 600;
+      web.width = cssSize * dpr; web.height = cssSize * dpr;
+      wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    sizeWeb();
+    window.addEventListener('resize', sizeWeb);
+
+    const setPolar = (s, ang, r) => { s.x = Math.cos(ang) * r; s.y = Math.sin(ang) * r; };
+    let tetherTimer = 2 + Math.random() * 1.5;
 
     // Initial spread at varied radii + random headings
     let r0 = radius();
     const st = icons.map((el, i) => {
       const ang = (i / icons.length) * Math.PI * 2 + Math.random() * 0.6;
-      const rad = r0 * (0.6 + Math.random() * 0.28);
-      const sp = 22 + Math.random() * 16;
+      const rad = r0 * (0.72 + Math.random() * 0.22);
+      const sp = 20 + Math.random() * 14;
       const dir = Math.random() * Math.PI * 2;
       const s = {
-        el, frozen: false, kick: 1 + Math.random() * 2.5,
+        el, frozen: false, tether: null, kick: 1 + Math.random() * 2.5,
         x: Math.cos(ang) * rad, y: Math.sin(ang) * rad,
         vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp
       };
@@ -369,6 +386,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
       for (const s of st) {
         if (s.frozen) continue;   // held still under the cursor → clickable
+
+        // ── Web tether: shoot → pull toward the core → release ──
+        if (s.tether) {
+          const T = s.tether; T.t += dt;
+          const SHOOT = 0.28, PULL = 0.6, REL = 0.22;
+          if (T.t < SHOOT) {
+            setPolar(s, T.ang, T.startR);                     // thread reaching out
+          } else if (T.t < SHOOT + PULL) {
+            const p = (T.t - SHOOT) / PULL;
+            const e = 1 - Math.pow(1 - p, 3);                 // easeOutCubic
+            const endR = Math.max(rMin * 1.05, T.startR * 0.48);
+            setPolar(s, T.ang, T.startR + (endR - T.startR) * e);  // pulled in
+          } else if (T.t < SHOOT + PULL + REL) {
+            /* hold briefly near the core */
+          } else {
+            s.vx = Math.cos(T.ang) * V_MAX * 0.9;             // released — drifts back out
+            s.vy = Math.sin(T.ang) * V_MAX * 0.9;
+            s.tether = null;
+          }
+          continue;
+        }
+
         // occasional random kick → breaks any circular pattern (true random drift)
         s.kick -= dt;
         if (s.kick <= 0) {
@@ -407,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
           let d = Math.hypot(dx, dy) || 0.001;
           if (d < MIN_DIST) {
             const nx = dx / d, ny = dy / d, push = (MIN_DIST - d) / 2;
-            if (!A.frozen) { A.x -= nx * push; A.y -= ny * push; A.vx -= nx * 6; A.vy -= ny * 6; }
-            if (!B.frozen) { B.x += nx * push; B.y += ny * push; B.vx += nx * 6; B.vy += ny * 6; }
+            if (!A.frozen && !A.tether) { A.x -= nx * push; A.y -= ny * push; A.vx -= nx * 6; A.vy -= ny * 6; }
+            if (!B.frozen && !B.tether) { B.x += nx * push; B.y += ny * push; B.vx += nx * 6; B.vy += ny * 6; }
           }
         }
       }
@@ -417,6 +456,52 @@ document.addEventListener('DOMContentLoaded', () => {
         const sc = s.frozen ? ' scale(1.25)' : '';
         s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)${sc}`;
       }
+
+      // ── Randomly tether a far, free symbol back toward the core ──
+      tetherTimer -= dt;
+      if (tetherTimer <= 0) {
+        const far = st.filter(s => !s.tether && !s.frozen && Math.hypot(s.x, s.y) > rMax * 0.8);
+        if (far.length) {
+          const s = far[(Math.random() * far.length) | 0];
+          s.tether = { t: 0, ang: Math.atan2(s.y, s.x), startR: Math.hypot(s.x, s.y) };
+        }
+        tetherTimer = 1.0 + Math.random() * 1.8;
+      }
+
+      // ── Draw the silk web threads (core → tethered symbols) ──
+      if (wctx) {
+        wctx.clearRect(0, 0, cssSize, cssSize);
+        const cx = cssSize / 2, cy = cssSize / 2;
+        const total = 0.28 + 0.6 + 0.22;
+        for (const s of st) {
+          if (!s.tether) continue;
+          const T = s.tether;
+          let reach = 1, alpha = 0.75;
+          if (T.t < 0.28) reach = T.t / 0.28;                       // thread growing out
+          else if (T.t > total - 0.22) alpha = 0.75 * Math.max(0, 1 - (T.t - (total - 0.22)) / 0.22);
+          const ex = cx + s.x, ey = cy + s.y;
+          const tx = cx + (ex - cx) * reach, ty = cy + (ey - cy) * reach;
+          const dx = tx - cx, dy = ty - cy, len = Math.hypot(dx, dy) || 1;
+          const px = -dy / len, py = dx / len;
+          wctx.beginPath();
+          wctx.moveTo(cx, cy);
+          for (let i = 1; i <= 6; i++) {
+            const f = i / 6;
+            const amp = Math.sin(f * Math.PI) * 4 * Math.sin(now * 0.008 + f * 6);  // silk wobble
+            wctx.lineTo(cx + dx * f + px * amp, cy + dy * f + py * amp);
+          }
+          wctx.strokeStyle = 'rgba(168,85,247,' + alpha + ')';
+          wctx.lineWidth = 1.4;
+          wctx.shadowBlur = 8; wctx.shadowColor = 'rgba(168,85,247,0.7)';
+          wctx.stroke();
+          wctx.shadowBlur = 0;
+          wctx.beginPath();
+          wctx.arc(tx, ty, 3, 0, 6.2832);                          // hook glow at the symbol
+          wctx.fillStyle = 'rgba(34,211,238,' + alpha + ')';
+          wctx.fill();
+        }
+      }
+
       requestAnimationFrame(frame);
     }
     frame(performance.now());
