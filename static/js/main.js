@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.toggle('leaving-up', entry.boundingClientRect.top < window.innerHeight * 0.5);
       }
     });
-  }, { threshold: 0.05, rootMargin: '-24% 0px -10% 0px' });
+  }, { threshold: 0.05, rootMargin: '-72px 0px -10% 0px' });
 
   revealEls.forEach(el => revealObserver.observe(el));
 
