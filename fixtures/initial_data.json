@@ -1,0 +1,233 @@
+[
+  {
+    "model": "bio.bio",
+    "pk": 1,
+    "fields": {
+      "name": "Yasir Naeem",
+      "job_title": "Full Stack Developer",
+      "tagline": "Building elegant digital experiences — one line of code at a time.",
+      "profile_picture": "",
+      "description": "I'm a passionate Computer Science student at University with a deep love for building things that live on the internet. I focus on creating clean, user-friendly applications with modern technologies.\n\nMy journey started with curiosity about how websites work, and it has grown into a full-fledged passion for software engineering. I enjoy solving complex problems and turning ideas into reality through code.\n\nWhen I'm not coding, you'll find me exploring open-source projects, contributing to the community, or learning about the latest trends in web development and AI.",
+      "email": "faranaveed9@gmail.com",
+      "phone": "+92-300-1234567",
+      "location": "Lahore, Pakistan",
+      "github_url": "https://github.com/Yasir897",
+      "linkedin_url": "https://www.linkedin.com/in/yasir-naeem-a5176a321/",
+      "resume_file": ""
+    }
+  },
+  {
+    "model": "education.education",
+    "pk": 1,
+    "fields": {
+      "degree": "Bachelor of Science",
+      "field_of_study": "Computer Science",
+      "institution": "Punjab Group of Colleges",
+      "location": "Lahore, Pakistan",
+      "start_year": 2022,
+      "end_year": 2026,
+      "is_current": true,
+      "grade": "3.7 / 4.0 GPA",
+      "description": "Focusing on Software Engineering, Data Structures & Algorithms, Web Development, and Artificial Intelligence. Active member of the Programming Club.",
+      "order": 0
+    }
+  },
+  {
+    "model": "education.education",
+    "pk": 2,
+    "fields": {
+      "degree": "Intermediate (FSc Pre-Engineering)",
+      "field_of_study": "Pre-Engineering",
+      "institution": "Punjab College of Excellence",
+      "location": "Lahore, Pakistan",
+      "start_year": 2020,
+      "end_year": 2022,
+      "is_current": false,
+      "grade": "A+ (94%)",
+      "description": "Completed with distinction in Mathematics, Physics, and Computer Science.",
+      "order": 1
+    }
+  },
+  {
+    "model": "education.education",
+    "pk": 3,
+    "fields": {
+      "degree": "Matriculation (SSC)",
+      "field_of_study": "Science",
+      "institution": "Beacon House School System",
+      "location": "Lahore, Pakistan",
+      "start_year": 2018,
+      "end_year": 2020,
+      "is_current": false,
+      "grade": "A+ (95%)",
+      "description": "Graduated with highest honors in the Science group.",
+      "order": 2
+    }
+  },
+  {
+    "model": "skills.skillcategory",
+    "pk": 1,
+    "fields": { "name": "Languages", "order": 0 }
+  },
+  {
+    "model": "skills.skillcategory",
+    "pk": 2,
+    "fields": { "name": "Frameworks & Libraries", "order": 1 }
+  },
+  {
+    "model": "skills.skillcategory",
+    "pk": 3,
+    "fields": { "name": "Tools & Platforms", "order": 2 }
+  },
+  {
+    "model": "skills.skillcategory",
+    "pk": 4,
+    "fields": { "name": "Databases", "order": 3 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 1,
+    "fields": { "category": 1, "name": "Python", "proficiency": 80, "icon_class": "devicon-python-plain", "order": 0 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 2,
+    "fields": { "category": 1, "name": "JavaScript", "proficiency": 60, "icon_class": "devicon-javascript-plain", "order": 1 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 3,
+    "fields": { "category": 1, "name": "C++", "proficiency": 60, "icon_class": "devicon-cplusplus-plain", "order": 2 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 4,
+    "fields": { "category": 1, "name": "HTML / CSS", "proficiency": 80, "icon_class": "devicon-html5-plain", "order": 3 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 5,
+    "fields": { "category": 2, "name": "Django", "proficiency": 60, "icon_class": "devicon-django-plain", "order": 0 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 6,
+    "fields": { "category": 2, "name": "React.js", "proficiency": 40, "icon_class": "devicon-react-original", "order": 1 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 7,
+    "fields": { "category": 2, "name": "Bootstrap", "proficiency": 80, "icon_class": "devicon-bootstrap-plain", "order": 2 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 8,
+    "fields": { "category": 3, "name": "Git & GitHub", "proficiency": 80, "icon_class": "devicon-github-original", "order": 0 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 9,
+    "fields": { "category": 3, "name": "VS Code", "proficiency": 100, "icon_class": "devicon-vscode-plain", "order": 1 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 10,
+    "fields": { "category": 3, "name": "Linux / Bash", "proficiency": 60, "icon_class": "devicon-linux-plain", "order": 2 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 11,
+    "fields": { "category": 4, "name": "SQLite", "proficiency": 80, "icon_class": "devicon-sqlite-plain", "order": 0 }
+  },
+  {
+    "model": "skills.skill",
+    "pk": 12,
+    "fields": { "category": 4, "name": "MySQL", "proficiency": 60, "icon_class": "devicon-mysql-plain", "order": 1 }
+  },
+  {
+    "model": "experience.experience",
+    "pk": 1,
+    "fields": {
+      "job_title": "Web Development Intern",
+      "company": "TechLab Solutions",
+      "location": "Lahore, Pakistan (Remote)",
+      "start_date": "2024-06-01",
+      "end_date": "2024-08-31",
+      "is_current": false,
+      "description": "Developed and maintained responsive web applications using Django and JavaScript. Collaborated with a team of 5 engineers to deliver features on schedule. Implemented RESTful APIs and integrated third-party services. Improved page load performance by 30% through code optimization and caching strategies.",
+      "technologies": "Django, Python, JavaScript, PostgreSQL, Git",
+      "order": 0
+    }
+  },
+  {
+    "model": "experience.experience",
+    "pk": 2,
+    "fields": {
+      "job_title": "Freelance Developer",
+      "company": "Self-Employed",
+      "location": "Lahore, Pakistan",
+      "start_date": "2023-01-01",
+      "end_date": null,
+      "is_current": true,
+      "description": "Building custom websites and web applications for local businesses and startups. Delivered 5+ projects with high client satisfaction. Handled full project lifecycle from requirement gathering to deployment.",
+      "technologies": "Django, HTML, CSS, JavaScript, SQLite",
+      "order": 1
+    }
+  },
+  {
+    "model": "experience.project",
+    "pk": 1,
+    "fields": {
+      "title": "AI Study Assistant",
+      "description": "A Django-based web app that uses the OpenAI API to help students summarize lecture notes, generate quiz questions, and explain complex concepts in simple language.",
+      "technologies": "Python, Django, OpenAI API, JavaScript, Bootstrap",
+      "image": "",
+      "github_url": "https://github.com/Yasir897",
+      "live_url": "",
+      "is_featured": true,
+      "order": 0
+    }
+  },
+  {
+    "model": "experience.project",
+    "pk": 2,
+    "fields": {
+      "title": "E-Commerce Platform",
+      "description": "A full-featured online store with product listings, shopping cart, user authentication, and order management. Built with Django and integrated with payment gateway.",
+      "technologies": "Django, Python, SQLite, HTML, CSS, JavaScript",
+      "image": "",
+      "github_url": "https://github.com/Yasir897",
+      "live_url": "",
+      "is_featured": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "experience.project",
+    "pk": 3,
+    "fields": {
+      "title": "Task Management App",
+      "description": "A Kanban-style project management tool with drag-and-drop task boards, team collaboration features, deadline tracking, and progress analytics.",
+      "technologies": "Django, JavaScript, CSS, SQLite",
+      "image": "",
+      "github_url": "https://github.com/Yasir897",
+      "live_url": "",
+      "is_featured": false,
+      "order": 2
+    }
+  },
+  {
+    "model": "experience.project",
+    "pk": 4,
+    "fields": {
+      "title": "Personal Portfolio (This Site!)",
+      "description": "A dynamic portfolio website built with Django, featuring a particle animation background, smooth scroll animations, and a complete admin panel for content management.",
+      "technologies": "Django, Python, CSS, JavaScript, SQLite",
+      "image": "",
+      "github_url": "https://github.com/Yasir897",
+      "live_url": "",
+      "is_featured": false,
+      "order": 3
+    }
+  }
+]

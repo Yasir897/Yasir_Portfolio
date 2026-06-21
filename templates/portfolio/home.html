@@ -1,0 +1,450 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% if bio %}{{ bio.name }}{% else %}Portfolio{% endif %} | Portfolio</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Aurora Glow Background -->
+  <div class="aurora-bg" aria-hidden="true">
+    <div class="aurora-blob aurora-1"></div>
+    <div class="aurora-blob aurora-2"></div>
+    <div class="aurora-blob aurora-3"></div>
+    <div class="aurora-blob aurora-4"></div>
+  </div>
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- Particle Canvas Background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Cinematic Intro -->
+  <div id="intro-overlay">
+    <div id="introTop"></div>
+    <div id="introBottom"></div>
+    <div id="introName">
+      <span class="intro-initials">YN</span>
+      <span id="introFirst">YASIR</span>
+      <span id="introLast">NAEEM</span>
+      <span class="intro-subtitle">Full Stack Developer</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <span class="logo-bracket">&lt;</span>
+      {% if bio %}{{ bio.name.split.0 }}{% else %}DEV{% endif %}
+      <span class="logo-bracket">/&gt;</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#hero" class="nav-link">Home</a></li>
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#skills" class="nav-link">Skills</a></li>
+      <li><a href="#experience" class="nav-link">Experience</a></li>
+      <li><a href="#projects" class="nav-link">Projects</a></li>
+      <li><a href="#contact" class="nav-link">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#hero" class="mobile-link">Home</a></li>
+      <li><a href="#about" class="mobile-link">About</a></li>
+      <li><a href="#skills" class="mobile-link">Skills</a></li>
+      <li><a href="#experience" class="mobile-link">Experience</a></li>
+      <li><a href="#projects" class="mobile-link">Projects</a></li>
+      <li><a href="#contact" class="mobile-link">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <section id="hero" class="hero-section">
+    <div class="hero-glitch-overlay"></div>
+    <div class="hero-bg-text" aria-hidden="true">{% if bio %}{{ bio.name }}{% else %}YASIR NAEEM{% endif %}</div>
+    <div class="hero-content">
+      <div class="hero-badge reveal-fade">
+        <span class="badge-dot"></span>
+        Available for Opportunities
+      </div>
+      <h1 class="hero-name reveal-up">
+        {% if bio %}
+          {% for word in bio.name.split %}
+            <span class="word-reveal">{{ word }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="word-reveal">Your</span>
+          <span class="word-reveal">Name</span>
+        {% endif %}
+      </h1>
+      <div class="hero-title reveal-up">
+        <span class="typed-text" id="typedText"></span>
+        <span class="cursor">|</span>
+      </div>
+      {% if bio and bio.tagline %}
+      <p class="hero-tagline reveal-fade">{{ bio.tagline }}</p>
+      {% endif %}
+      <div class="hero-cta reveal-fade">
+        <a href="#projects" class="btn btn-primary">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Get In Touch</a>
+      </div>
+      <div class="hero-scroll-indicator">
+        <div class="scroll-line"></div>
+        <span>SCROLL</span>
+      </div>
+    </div>
+    <div class="hero-decoration" aria-hidden="true">
+      <div class="deco-circle deco-1"></div>
+      <div class="deco-circle deco-2"></div>
+    </div>
+    <div class="hero-marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Django</span><span class="mdot">✦</span><span>Python</span><span class="mdot">✦</span><span>JavaScript</span><span class="mdot">✦</span><span>React.js</span><span class="mdot">✦</span><span>CSS3</span><span class="mdot">✦</span><span>Git</span><span class="mdot">✦</span><span>REST API</span><span class="mdot">✦</span><span>SQLite</span><span class="mdot">✦</span><span>Bootstrap</span><span class="mdot">✦</span><span>Linux</span><span class="mdot">✦</span><span>Django</span><span class="mdot">✦</span><span>Python</span><span class="mdot">✦</span><span>JavaScript</span><span class="mdot">✦</span><span>React.js</span><span class="mdot">✦</span><span>CSS3</span><span class="mdot">✦</span><span>Git</span><span class="mdot">✦</span><span>REST API</span><span class="mdot">✦</span><span>SQLite</span><span class="mdot">✦</span><span>Bootstrap</span><span class="mdot">✦</span><span>Linux</span><span class="mdot">✦</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ORBIT / TECH NUCLEUS SECTION ==================== -->
+  <section id="orbit" class="section orbit-section">
+    <div class="orbit-label reveal-fade">
+      <span class="orbit-label-line"></span>
+      The Tech I Orbit Around
+      <span class="orbit-label-line"></span>
+    </div>
+    <div class="orbit-system reveal-fade">
+
+      <!-- Glowing nucleus + name (protected center) -->
+      <div class="orbit-core">
+        <div class="orbit-nucleus"></div>
+        <h3 class="orbit-name">{% if bio %}{{ bio.name }}{% else %}Yasir Naeem{% endif %}</h3>
+      </div>
+
+      <!-- Floating tech logos (positioned & animated by JS) -->
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" alt="Python" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" alt="JavaScript" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" alt="React" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" alt="Git" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" alt="HTML5" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/django/django-plain.svg" alt="Django" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg" alt="C++" loading="lazy" />
+      </div>
+      <div class="orbit-icon" aria-hidden="true">
+        <img class="oi-logo" src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" alt="CSS3" loading="lazy" />
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== ABOUT / BIO SECTION ==================== -->
+  <section id="about" class="section parallax-section light-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="01">
+        <span class="section-number">01</span>
+        <h2 class="section-title scramble-title">About Me</h2>
+        <div class="section-line"></div>
+      </div>
+      {% if bio %}
+      <div class="about-grid">
+        <div class="about-image-wrap reveal-left">
+          <div class="image-frame">
+            {% if bio.profile_picture %}
+            <img src="{{ bio.profile_picture.url }}" alt="{{ bio.name }}" class="profile-img" />
+            {% else %}
+            <div class="profile-placeholder">
+              <span>{{ bio.name.0 }}</span>
+            </div>
+            {% endif %}
+            <div class="image-border-anim"></div>
+          </div>
+          <div class="about-stats">
+            <div class="stat-box">
+              <span class="stat-num" data-count="3">0</span>
+              <span class="stat-label">Years Learning</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" data-count="10">0</span>
+              <span class="stat-label">Projects Built</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" data-count="8">0</span>
+              <span class="stat-label">Technologies</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-text reveal-right">
+          <h3 class="about-role">{{ bio.job_title }}</h3>
+          <div class="about-description">
+            {{ bio.description|linebreaks }}
+          </div>
+          <div class="about-details">
+            {% if bio.location %}
+            <div class="detail-item">
+              <span class="detail-icon">&#9673;</span>
+              <span>{{ bio.location }}</span>
+            </div>
+            {% endif %}
+            {% if bio.email %}
+            <div class="detail-item">
+              <span class="detail-icon">&#9993;</span>
+              <span>{{ bio.email }}</span>
+            </div>
+            {% endif %}
+          </div>
+          <div class="about-links">
+            {% if bio.github_url %}
+            <a href="{{ bio.github_url }}" target="_blank" class="social-link">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.207 11.387.6.113.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              GitHub
+            </a>
+            {% endif %}
+            {% if bio.linkedin_url %}
+            <a href="{{ bio.linkedin_url }}" target="_blank" class="social-link">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              LinkedIn
+            </a>
+            {% endif %}
+            {% if bio.resume_file %}
+            <a href="{{ bio.resume_file.url }}" download class="social-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Resume
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ==================== EDUCATION SECTION ==================== -->
+  <section id="education" class="section dark-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="02">
+        <span class="section-number">02</span>
+        <h2 class="section-title scramble-title">Education</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="timeline">
+        {% for edu in education %}
+        <div class="timeline-item reveal-up" style="--delay: {{ forloop.counter0 }}00ms">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-year">{{ edu.year_range }}</div>
+            <h3 class="timeline-title">{{ edu.degree }}</h3>
+            <h4 class="timeline-subtitle">{{ edu.field_of_study }}</h4>
+            <p class="timeline-org">{{ edu.institution }}{% if edu.location %} &mdash; {{ edu.location }}{% endif %}</p>
+            {% if edu.grade %}<p class="timeline-grade">Grade: <strong>{{ edu.grade }}</strong></p>{% endif %}
+            {% if edu.description %}<p class="timeline-desc">{{ edu.description }}</p>{% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">Education entries will appear here once added via admin.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SKILLS SECTION ==================== -->
+  <section id="skills" class="section parallax-section light-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="03">
+        <span class="section-number">03</span>
+        <h2 class="section-title scramble-title">Skills</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="skills-grid">
+        {% for category in skill_categories %}
+        <div class="skill-category-card reveal-up" style="--delay: {{ forloop.counter0 }}00ms">
+          <h3 class="skill-cat-title">{{ category.name }}</h3>
+          <div class="skills-list">
+            {% for skill in category.skills.all %}
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">{{ skill.name }}</span>
+                <span class="skill-percent">{{ skill.proficiency }}%</span>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-fill" data-width="{{ skill.proficiency }}"></div>
+              </div>
+              <span class="skill-level-label">{{ skill.get_proficiency_display }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% empty %}
+        <p class="empty-state">Skills will appear here once added via admin.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== EXPERIENCE SECTION ==================== -->
+  <section id="experience" class="section dark-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="04">
+        <span class="section-number">04</span>
+        <h2 class="section-title scramble-title">Experience</h2>
+        <div class="section-line"></div>
+      </div>
+      {% if experiences %}
+      <div class="experience-grid">
+        {% for exp in experiences %}
+        <div class="exp-card reveal-up" style="--delay: {{ forloop.counter0 }}00ms">
+          <div class="exp-header">
+            <div>
+              <h3 class="exp-title">{{ exp.job_title }}</h3>
+              <p class="exp-company">{{ exp.company }}</p>
+            </div>
+            <div class="exp-meta">
+              <span class="exp-date">
+                {{ exp.start_date|date:"M Y" }} &ndash; {% if exp.is_current %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}
+              </span>
+              {% if exp.location %}<span class="exp-location">{{ exp.location }}</span>{% endif %}
+            </div>
+          </div>
+          <p class="exp-desc">{{ exp.description }}</p>
+          {% if exp.tech_list %}
+          <div class="tech-tags">
+            {% for tech in exp.tech_list %}
+            <span class="tech-tag">{{ tech }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="empty-state">Experience entries will appear here once added via admin.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ==================== PROJECTS SECTION ==================== -->
+  <section id="projects" class="section light-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="05">
+        <span class="section-number">05</span>
+        <h2 class="section-title scramble-title">Projects</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="projects-grid">
+        {% for project in projects %}
+        <div class="project-card reveal-up" style="--delay: {{ forloop.counter0 }}00ms">
+          <div class="project-image-wrap">
+            {% if project.image %}
+            <img src="{{ project.image.url }}" alt="{{ project.title }}" class="project-img" />
+            {% else %}
+            <div class="project-img-placeholder">
+              <div class="placeholder-grid"></div>
+              <span class="placeholder-letter">{{ project.title.0 }}</span>
+            </div>
+            {% endif %}
+            <div class="project-overlay">
+              <div class="project-links">
+                {% if project.github_url %}
+                <a href="{{ project.github_url }}" target="_blank" class="proj-link" title="GitHub">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.207 11.387.6.113.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                </a>
+                {% endif %}
+                {% if project.live_url %}
+                <a href="{{ project.live_url }}" target="_blank" class="proj-link" title="Live Demo">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="project-info">
+            <span class="project-num">{{ forloop.counter|stringformat:"02d" }}</span>
+            <h3 class="project-title">{{ project.title }}</h3>
+            <p class="project-desc">{{ project.description }}</p>
+            {% if project.tech_list %}
+            <div class="tech-tags">
+              {% for tech in project.tech_list %}
+              <span class="tech-tag">{{ tech }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% if project.is_featured %}
+          <div class="featured-badge">Featured</div>
+          {% endif %}
+        </div>
+        {% empty %}
+        <p class="empty-state">Projects will appear here once added via admin.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACT SECTION ==================== -->
+  <section id="contact" class="section dark-section contact-section">
+    <div class="container">
+      <div class="section-header reveal-up" data-num="06">
+        <span class="section-number">06</span>
+        <h2 class="section-title scramble-title">Get In Touch</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="contact-content reveal-up">
+        <p class="contact-tagline">Let's build something great together.</p>
+        {% if bio and bio.email %}
+        <a href="mailto:{{ bio.email }}" class="contact-email-big">{{ bio.email }}</a>
+        {% endif %}
+        <div class="contact-bottom">
+          <a href="mailto:{% if bio %}{{ bio.email }}{% endif %}" class="btn btn-primary btn-large magnetic-btn">Say Hello ↗</a>
+          <div class="contact-socials">
+            {% if bio and bio.github_url %}
+            <a href="{{ bio.github_url }}" target="_blank" class="contact-social-btn">GitHub</a>
+            {% endif %}
+            {% if bio and bio.linkedin_url %}
+            <a href="{{ bio.linkedin_url }}" target="_blank" class="contact-social-btn">LinkedIn</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>
+      Designed &amp; Built by
+      {% if bio %}<strong>{{ bio.name }}</strong>{% else %}<strong>Developer</strong>{% endif %}
+    </p>
+    <p class="footer-tech">Django &bull; Python &bull; CSS &bull; JavaScript</p>
+  </footer>
+
+  <script src="{% static 'js/main.js' %}?v=4"></script>
+  <script>
+    const typedRoles = [
+      "{% if bio %}{{ bio.job_title }}{% else %}Full Stack Developer{% endif %}",
+      "Problem Solver",
+      "Open Source Enthusiast",
+      "UI/UX Thinker"
+    ];
+  </script>
+</body>
+</html>
