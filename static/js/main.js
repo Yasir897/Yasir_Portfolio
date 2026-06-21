@@ -475,11 +475,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tetherTimer -= dt;
       if (tetherTimer <= 0) {
         const far = st.filter(s => !s.tether && !s.frozen && Math.hypot(s.x, s.y) > rMax * 0.72);
-        if (far.length) {
-          const s = far[(Math.random() * far.length) | 0];
+        const count = (far.length > 3 && Math.random() < 0.45) ? 2 : 1;   // sometimes grab two
+        for (let n = 0; n < count && far.length; n++) {
+          const s = far.splice((Math.random() * far.length) | 0, 1)[0];
           s.tether = { t: 0, ang: Math.atan2(s.y, s.x), startR: Math.hypot(s.x, s.y) };
         }
-        tetherTimer = 2.4 + Math.random() * 2.6;          // calmer, elegant frequency
+        tetherTimer = 2.2 + Math.random() * 2.4;          // calm, elegant frequency
       }
 
       // ── Draw organic spider-silk threads (core → tethered symbols) ──
@@ -494,33 +495,44 @@ document.addEventListener('DOMContentLoaded', () => {
           if (T.t < 0.45) { reach = T.t / 0.45; alpha = 0.55 * reach; }        // silk extends out
           else if (T.t > total - 0.5) alpha = 0.55 * Math.max(0, 1 - (T.t - (total - 0.5)) / 0.5);  // fades on release
           const tx = cx + s.x * reach, ty = cy + s.y * reach;
-          let dx = tx - cx, dy = ty - cy; const len = Math.hypot(dx, dy) || 1;
-          // perpendicular, biased downward → natural silk droop (catenary)
-          let px = -dy / len, py = dx / len;
-          if (py < 0) { px = -px; py = -py; }
-          const sag = Math.min(len * 0.13, 22);
+          const dx = tx - cx, dy = ty - cy;
+          const base = Math.atan2(dy, dx);
+          const gripR = ICON_HALF * 0.95 * Math.min(1, reach / 0.7);  // spread onto the symbol as it reaches
+          const STRANDS = 5;
 
-          function strand(extraSag, width, a) {
+          // Helper: one sagging silk strand from the core to a point
+          function silk(ex, ey, width, a) {
+            const ddx = ex - cx, ddy = ey - cy, dl = Math.hypot(ddx, ddy) || 1;
+            let qx = -ddy / dl, qy = ddx / dl;
+            if (qy < 0) { qx = -qx; qy = -qy; }                 // droop downward
+            const sg = Math.min(dl * 0.12, 20);
             wctx.beginPath();
             wctx.moveTo(cx, cy);
-            for (let i = 1; i <= 18; i++) {
-              const f = i / 18;
-              const droop = Math.sin(f * Math.PI) * (sag + extraSag);
-              wctx.lineTo(cx + dx * f + px * droop, cy + dy * f + py * droop);
+            for (let i = 1; i <= 16; i++) {
+              const f = i / 16;
+              const dr = Math.sin(f * Math.PI) * sg;
+              wctx.lineTo(cx + ddx * f + qx * dr, cy + ddy * f + qy * dr);
             }
             wctx.strokeStyle = 'rgba(216,221,250,' + a + ')';
             wctx.lineWidth = width;
             wctx.stroke();
           }
-          // soft pale-silk glow, then crisp strand + a fainter parallel filament
-          wctx.shadowBlur = 3; wctx.shadowColor = 'rgba(190,180,255,0.35)';
-          strand(0, 1.0, alpha);
+
+          // Multiple silk threads fanning from the core onto the symbol's near side
+          wctx.shadowBlur = 3; wctx.shadowColor = 'rgba(190,180,255,0.3)';
+          const mid = (STRANDS - 1) / 2;
+          for (let k = 0; k < STRANDS; k++) {
+            const off = k - mid;                                // -2 .. 2
+            const pa = base + off * 0.42;
+            const ex = tx - Math.cos(pa) * gripR;
+            const ey = ty - Math.sin(pa) * gripR;
+            const central = Math.abs(off) < 0.6;
+            silk(ex, ey, central ? 1.0 : 0.7, alpha * (central ? 0.9 : 0.45));
+          }
           wctx.shadowBlur = 0;
-          strand(3.5, 0.6, alpha * 0.35);
 
           // silk wrapping the hooked symbol (only when fully reached)
           if (reach > 0.985) {
-            const base = Math.atan2(dy, dx);
             for (let k = 0; k < 3; k++) {
               wctx.beginPath();
               wctx.arc(tx, ty, 9 + k * 3.5, base + k * 0.6, base + k * 0.6 + 2.3);
