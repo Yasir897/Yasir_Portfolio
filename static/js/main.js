@@ -90,12 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // The old heavy particle field (120 dots + per-dot shadow + double web)
   // was removed because it caused jank while scrolling.
 
-  /* ─── NAVBAR SCROLL ─── */
+  /* ─── NAVBAR (scroll work handled by consolidated handler below) ─── */
   const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-    highlightNavLink();
-  });
 
   /* ─── MOBILE MENU ─── */
   const navToggle = document.getElementById('navToggle');
@@ -213,14 +209,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.toggle('cursor-light', anyLight);
   }, { threshold: [0, 0.5, 1] });
   lightSects.forEach(s => cursorObserver.observe(s));
-  window.addEventListener('scroll', () => {
+
+  /* ─── CONSOLIDATED SCROLL HANDLER (rAF-throttled → no scroll jank) ─── */
+  const decoCircles = document.querySelectorAll('.deco-circle');
+  const progressBarEl = document.getElementById('scroll-progress');
+  let scrollTick = false;
+  function onScrollFrame() {
+    scrollTick = false;
+    const sy = window.scrollY;
+    navbar.classList.toggle('scrolled', sy > 50);
+    if (progressBarEl) {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      progressBarEl.style.transform = `scaleX(${max > 0 ? sy / max : 0})`;
+    }
+    highlightNavLink();
+    for (const el of decoCircles) {
+      el.style.transform = `translateY(${sy * 0.08}px) rotate(${sy * 0.02}deg)`;
+    }
     let anyLight = false;
     lightSects.forEach(s => {
       const r = s.getBoundingClientRect();
       if (r.top < window.innerHeight * 0.5 && r.bottom > window.innerHeight * 0.5) anyLight = true;
     });
     document.body.classList.toggle('cursor-light', anyLight);
+  }
+  window.addEventListener('scroll', () => {
+    if (!scrollTick) { scrollTick = true; requestAnimationFrame(onScrollFrame); }
   }, { passive: true });
+  onScrollFrame();
 
   /* ─── TEXT SCRAMBLE on section titles ─── */
   const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$';
@@ -291,13 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   driftBlobs();
 
-  /* ─── PARALLAX EFFECT ─── */
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    document.querySelectorAll('.deco-circle').forEach(el => {
-      el.style.transform = `translateY(${scrollY * 0.08}px) rotate(${scrollY * 0.02}deg)`;
-    });
-  });
+  /* ─── PARALLAX is handled by the consolidated scroll handler above ─── */
 
   /* ─── SMOOTH ANCHOR SCROLL ─── */
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -328,14 +339,22 @@ document.addEventListener('DOMContentLoaded', () => {
       return (w && w > 0 ? w : Math.min(window.innerWidth * 0.86, 560)) / 2;
     }
 
-    // Initial spread on a mid ring, each with a random heading
+    // Initial spread at varied radii + random headings
     let r0 = radius();
     const st = icons.map((el, i) => {
-      const ang = (i / icons.length) * Math.PI * 2 + Math.random() * 0.5;
-      const rad = r0 * 0.74;
+      const ang = (i / icons.length) * Math.PI * 2 + Math.random() * 0.6;
+      const rad = r0 * (0.6 + Math.random() * 0.28);
       const sp = 22 + Math.random() * 16;
       const dir = Math.random() * Math.PI * 2;
-      return { el, x: Math.cos(ang) * rad, y: Math.sin(ang) * rad, vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp };
+      const s = {
+        el, frozen: false, kick: 1 + Math.random() * 2.5,
+        x: Math.cos(ang) * rad, y: Math.sin(ang) * rad,
+        vx: Math.cos(dir) * sp, vy: Math.sin(dir) * sp
+      };
+      // Hover → freeze this logo (so it's easy to click) + highlight
+      el.addEventListener('mouseenter', () => { s.frozen = true; el.classList.add('is-hover'); });
+      el.addEventListener('mouseleave', () => { s.frozen = false; el.classList.remove('is-hover'); });
+      return s;
     });
 
     let last = performance.now();
@@ -349,9 +368,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const rMax = R * R_MAX - ICON_HALF;
 
       for (const s of st) {
+        if (s.frozen) continue;   // held still under the cursor → clickable
+        // occasional random kick → breaks any circular pattern (true random drift)
+        s.kick -= dt;
+        if (s.kick <= 0) {
+          const kd = Math.random() * Math.PI * 2, ks = V_MIN + Math.random() * (V_MAX - V_MIN);
+          s.vx = Math.cos(kd) * ks; s.vy = Math.sin(kd) * ks;
+          s.kick = 1.2 + Math.random() * 2.5;
+        }
         // random wander
-        s.vx += (Math.random() - 0.5) * 34 * dt;
-        s.vy += (Math.random() - 0.5) * 34 * dt;
+        s.vx += (Math.random() - 0.5) * 60 * dt;
+        s.vy += (Math.random() - 0.5) * 60 * dt;
         // keep speed in range so they never stop and never bolt
         let sp = Math.hypot(s.vx, s.vy) || 0.001;
         if (sp < V_MIN) { const f = V_MIN / sp; s.vx *= f; s.vy *= f; }
@@ -380,16 +407,15 @@ document.addEventListener('DOMContentLoaded', () => {
           let d = Math.hypot(dx, dy) || 0.001;
           if (d < MIN_DIST) {
             const nx = dx / d, ny = dy / d, push = (MIN_DIST - d) / 2;
-            A.x -= nx * push; A.y -= ny * push;
-            B.x += nx * push; B.y += ny * push;
-            A.vx -= nx * 6; A.vy -= ny * 6;
-            B.vx += nx * 6; B.vy += ny * 6;
+            if (!A.frozen) { A.x -= nx * push; A.y -= ny * push; A.vx -= nx * 6; A.vy -= ny * 6; }
+            if (!B.frozen) { B.x += nx * push; B.y += ny * push; B.vx += nx * 6; B.vy += ny * 6; }
           }
         }
       }
 
       for (const s of st) {
-        s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)`;
+        const sc = s.frozen ? ' scale(1.25)' : '';
+        s.el.style.transform = `translate(-50%, -50%) translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px)${sc}`;
       }
       requestAnimationFrame(frame);
     }
@@ -397,18 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(frame);
   })();
 
-  /* ─── TOP SCROLL PROGRESS BAR ─── */
-  const progressBar = document.getElementById('scroll-progress');
-  if (progressBar) {
-    const updateProgress = () => {
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - doc.clientHeight;
-      const ratio = max > 0 ? doc.scrollTop / max : 0;
-      progressBar.style.transform = `scaleX(${ratio})`;
-    };
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
-  }
+  /* ─── TOP SCROLL PROGRESS BAR is updated by the consolidated handler ─── */
 
   /* ─── BACKGROUND WEB + SPIDER (single lightweight canvas) ─── */
   (function initSpider() {
@@ -433,12 +448,14 @@ document.addEventListener('DOMContentLoaded', () => {
     build();
     window.addEventListener('resize', build);
 
-    const mouse = { x: w / 2, y: h / 2, has: false };
-    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.has = true; }, { passive: true });
+    let heading = 0, t = 0;
+    const mouse = { x: w / 2, y: h / 2, has: false, movedAt: -999 };
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX; mouse.y = e.clientY; mouse.has = true; mouse.movedAt = t;
+    }, { passive: true });
 
     const spider = { x: w / 2, y: h / 2 };
     const feet = []; for (let i = 0; i < 8; i++) feet.push({ x: w / 2, y: h / 2 });
-    let heading = 0, t = 0;
 
     function drawSpider() {
       const sideAngles = [0.95, 1.4, 1.95, 2.45];
@@ -480,8 +497,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function draw() {
       t++;
       ctx.clearRect(0, 0, w, h);
-      let tx = mouse.x, ty = mouse.y;
-      if (!mouse.has) { tx = w * 0.5 + Math.cos(t * 0.005) * w * 0.28; ty = h * 0.45 + Math.sin(t * 0.007) * h * 0.22; }
+      // Follow the cursor; if it hasn't moved for a bit (e.g. while scrolling),
+      // gently wander so the spider stays alive instead of looking frozen.
+      let tx, ty;
+      if (mouse.has && (t - mouse.movedAt) < 80) {
+        tx = mouse.x; ty = mouse.y;
+      } else {
+        tx = w * 0.5 + Math.cos(t * 0.006) * w * 0.3;
+        ty = h * 0.45 + Math.sin(t * 0.0085) * h * 0.25;
+      }
 
       // drift nodes
       for (const p of nodes) {

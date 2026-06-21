@@ -1415,6 +1415,12 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
   transform: translate(-50%, -50%);
   will-change: transform;
 }
+.orbit-icon { cursor: pointer; transition: box-shadow 0.25s ease, border-color 0.25s ease; }
+.orbit-icon.is-hover {
+  z-index: 6;
+  border-color: #fff;
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.85);
+}
 .oi-logo {
   width: 30px; height: 30px;
   display: block;
