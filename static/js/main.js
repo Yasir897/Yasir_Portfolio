@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
     const body = { x: mx, y: my, heading: 0 };
-    const REACH = 78, STEP_THRESH = 50, EASE = 0.05;
+    const REACH = 68, STEP_THRESH = 40, TURN = 0.12, MAX_SPEED = 5;
 
     // 8 legs — 4 each side, spread around the body's perpendicular
     const legs = [];
@@ -528,11 +528,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function frame() {
-      // chase the cursor
-      body.x += (mx - body.x) * EASE;
-      body.y += (my - body.y) * EASE;
-      const vx = mx - body.x, vy = my - body.y;
-      if (Math.hypot(vx, vy) > 1.2) body.heading = Math.atan2(vy, vx);
+      // Turn toward the cursor first, then walk forward along the heading
+      // (so it scuttles like a spider instead of gliding/flying sideways).
+      const dx = mx - body.x, dy = my - body.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 6) {
+        const desired = Math.atan2(dy, dx);
+        let diff = desired - body.heading;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));  // normalise to -PI..PI
+        body.heading += diff * TURN;                         // rotate gradually
+        const speed = Math.min(dist * 0.05, MAX_SPEED);
+        body.x += Math.cos(body.heading) * speed;
+        body.y += Math.sin(body.heading) * speed;
+      }
       const hd = body.heading;
 
       x.clearRect(0, 0, W, H);
@@ -556,8 +564,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // bent knee (lift perpendicular to the leg line)
         const midx = (sx + leg.foot.x) / 2, midy = (sy + leg.foot.y) / 2;
         const lAng = Math.atan2(leg.foot.y - sy, leg.foot.x - sx);
-        const knx = midx + Math.cos(lAng - (Math.PI / 2) * leg.side) * 16;
-        const kny = midy + Math.sin(lAng - (Math.PI / 2) * leg.side) * 16;
+        const lift = leg.stepping ? 26 : 14;   // raise the knee while taking a step
+        const knx = midx + Math.cos(lAng - (Math.PI / 2) * leg.side) * lift;
+        const kny = midy + Math.sin(lAng - (Math.PI / 2) * leg.side) * lift;
 
         x.beginPath();
         x.moveTo(sx, sy);

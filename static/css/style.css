@@ -146,16 +146,8 @@ ul { list-style: none; }
   background: var(--aurora-cyan);
   box-shadow: 0 0 10px var(--aurora-cyan);
 }
-.cursor-ring {
-  width: 36px; height: 36px;
-  border: 1.5px solid rgba(168, 85, 247, 0.7);
-  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-}
-.cursor-ring.hover {
-  width: 58px; height: 58px;
-  border-color: var(--aurora-pink);
-  background: rgba(236, 72, 153, 0.08);
-}
+/* Ring (gol daira) hidden — only the dot follows the cursor */
+.cursor-ring { display: none; }
 
 /* ============================
    PARTICLE CANVAS
