@@ -274,6 +274,15 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
   });
 
+  /* ─── PROJECT CARDS → open GitHub on click ─── */
+  document.querySelectorAll('.project-card[data-href]').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', e => {
+      if (e.target.closest('a')) return;   // an inner link (GitHub/Live icon) was clicked — let it work
+      window.open(card.dataset.href, '_blank', 'noopener');
+    });
+  });
+
   /* ─── 3D TILT ON CARDS ─── */
   const tiltCards = document.querySelectorAll('.project-card, .skill-category-card, .timeline-content');
   tiltCards.forEach(card => {
