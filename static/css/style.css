@@ -75,10 +75,9 @@ ul { list-style: none; }
 .aurora-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.5;
-  mix-blend-mode: screen;
-  will-change: transform;
+  filter: blur(70px);
+  opacity: 0.45;
+  will-change: transform;   /* own GPU layer; mix-blend-mode removed (costly on scroll) */
 }
 .aurora-1 {
   width: 50vw; height: 50vw;
@@ -726,14 +725,15 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
 /* ============================
    GLASS CARD BASE (shared look)
    ============================ */
+/* NOTE: backdrop-filter blur was removed from these cards — it re-blurred the
+   page behind every card on each scroll frame and was the main scroll-lag
+   cause. A slightly more opaque panel keeps the same frosted-glass look. */
 .timeline-content,
 .skill-category-card,
 .exp-card,
 .project-card,
 .stat-box {
-  background: var(--bg-panel);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  background: rgba(20, 16, 32, 0.55);
   border: 1px solid var(--glass-border);
 }
 

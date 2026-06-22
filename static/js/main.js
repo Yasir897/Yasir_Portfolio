@@ -374,8 +374,17 @@ document.addEventListener('DOMContentLoaded', () => {
       return s;
     });
 
+    // Pause the whole orbit animation while the section is off-screen
+    let orbitVisible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((ents) => {
+        orbitVisible = ents[0].isIntersecting;
+      }, { rootMargin: '120px' }).observe(system);
+    }
+
     let last = performance.now();
     function frame(now) {
+      if (!orbitVisible || document.hidden) { last = now; requestAnimationFrame(frame); return; }
       let dt = (now - last) / 1000;
       last = now;
       if (dt > 0.05) dt = 0.05;   // clamp after tab switch
@@ -650,9 +659,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       drawSpider();
-      requestAnimationFrame(draw);
     }
-    draw();
+    // Throttle to ~33fps and pause when the tab is hidden (lighter, smoother scroll)
+    let lastDraw = 0;
+    function loop(now) {
+      requestAnimationFrame(loop);
+      if (document.hidden || now - lastDraw < 30) return;
+      lastDraw = now;
+      draw();
+    }
+    requestAnimationFrame(loop);
   })();
 
   /* ─── GLITCH EFFECT ON HERO NAME ─── */
