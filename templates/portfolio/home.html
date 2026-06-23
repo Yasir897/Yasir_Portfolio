@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% if bio %}{{ bio.name }}{% else %}Portfolio{% endif %} | Portfolio</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=21" />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=22" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -457,7 +457,7 @@
     <p class="footer-tech">Django &bull; Python &bull; CSS &bull; JavaScript</p>
   </footer>
 
-  <script src="{% static 'js/main.js' %}?v=21"></script>
+  <script src="{% static 'js/main.js' %}?v=22"></script>
   <script>
     const typedRoles = [
       "{% if bio %}{{ bio.job_title }}{% else %}Full Stack Developer{% endif %}",

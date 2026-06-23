@@ -753,8 +753,10 @@ body.cursor-light .cursor-ring { border-color: rgba(124, 58, 237, 0.6); }
 }
 .profile-img {
   width: 300px; height: 300px;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center top;
   filter: grayscale(60%) contrast(1.05);
+  border: 1px solid var(--glass-border);
   border-radius: 18px;
   transition: filter 0.4s ease, box-shadow 0.4s ease;
 }
