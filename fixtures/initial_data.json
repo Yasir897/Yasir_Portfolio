@@ -1,245 +1,389 @@
 [
-  {
-    "model": "bio.bio",
-    "pk": 1,
-    "fields": {
-      "name": "Yasir Naeem",
-      "job_title": "Full Stack Developer",
-      "tagline": "Full Stack Developer â€” turning ideas into real web apps with React, Next.js & Django.",
-      "profile_picture": "bio/yasir_naeem.png",
-      "description": "BS Computer Science student at the University of Management and Technology (UMT), Lahore, with 6 semesters completed. A Full Stack Developer comfortable across both frontend and backend, with a solid foundation in C++ and a good command of Python.\n\nExperienced in building complete web applications using React, Next.js, and Django, alongside hands-on work in automation and databases. I keep sharpening my programming and problem-solving skills by building real-world university and personal projects.",
-      "email": "yasir007naeem@gmail.com",
-      "phone": "+92 314 4107039",
-      "location": "Lahore, Pakistan",
-      "github_url": "https://github.com/Yasir897",
-      "linkedin_url": "https://www.linkedin.com/in/yasir-naeem-a5176a321/",
-      "resume_file": ""
-    }
-  },
-  {
-    "model": "education.education",
-    "pk": 1,
-    "fields": {
-      "degree": "BS Computer Science",
-      "field_of_study": "Computer Science",
-      "institution": "University of Management and Technology (UMT)",
-      "location": "Lahore, Pakistan",
-      "start_year": 2022,
-      "end_year": 2026,
-      "is_current": true,
-      "grade": "6 Semesters Completed",
-      "description": "Currently pursuing BS Computer Science. Relevant coursework: Data Structures & Algorithms, Object-Oriented Programming, Database Systems, Web Technologies, Artificial Intelligence, and Operating Systems.",
-      "order": 0
-    }
-  },
-  {
-    "model": "skills.skillcategory",
-    "pk": 1,
-    "fields": { "name": "Languages", "order": 0 }
-  },
-  {
-    "model": "skills.skillcategory",
-    "pk": 2,
-    "fields": { "name": "Web & Frameworks", "order": 1 }
-  },
-  {
-    "model": "skills.skillcategory",
-    "pk": 3,
-    "fields": { "name": "Tools & Platforms", "order": 2 }
-  },
-  {
-    "model": "skills.skillcategory",
-    "pk": 4,
-    "fields": { "name": "Databases", "order": 3 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 1,
-    "fields": { "category": 1, "name": "Python", "proficiency": 85, "icon_class": "devicon-python-plain", "order": 0 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 2,
-    "fields": { "category": 1, "name": "C++", "proficiency": 80, "icon_class": "devicon-cplusplus-plain", "order": 1 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 3,
-    "fields": { "category": 1, "name": "JavaScript", "proficiency": 80, "icon_class": "devicon-javascript-plain", "order": 2 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 4,
-    "fields": { "category": 1, "name": "TypeScript", "proficiency": 75, "icon_class": "devicon-typescript-plain", "order": 3 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 5,
-    "fields": { "category": 2, "name": "Django", "proficiency": 82, "icon_class": "devicon-django-plain", "order": 0 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 6,
-    "fields": { "category": 2, "name": "React", "proficiency": 80, "icon_class": "devicon-react-original", "order": 1 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 7,
-    "fields": { "category": 2, "name": "Next.js", "proficiency": 75, "icon_class": "devicon-nextjs-original", "order": 2 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 8,
-    "fields": { "category": 2, "name": "HTML / CSS", "proficiency": 90, "icon_class": "devicon-html5-plain", "order": 3 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 9,
-    "fields": { "category": 2, "name": "Tailwind CSS", "proficiency": 80, "icon_class": "devicon-tailwindcss-original", "order": 4 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 10,
-    "fields": { "category": 3, "name": "Git & GitHub", "proficiency": 85, "icon_class": "devicon-github-original", "order": 0 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 11,
-    "fields": { "category": 3, "name": "VS Code", "proficiency": 95, "icon_class": "devicon-vscode-plain", "order": 1 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 12,
-    "fields": { "category": 3, "name": "Automation (Selenium)", "proficiency": 70, "icon_class": "devicon-selenium-original", "order": 2 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 13,
-    "fields": { "category": 4, "name": "SQL", "proficiency": 75, "icon_class": "devicon-azuresqldatabase-plain", "order": 0 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 14,
-    "fields": { "category": 4, "name": "MySQL", "proficiency": 70, "icon_class": "devicon-mysql-plain", "order": 1 }
-  },
-  {
-    "model": "skills.skill",
-    "pk": 15,
-    "fields": { "category": 4, "name": "SQLite", "proficiency": 80, "icon_class": "devicon-sqlite-plain", "order": 2 }
-  },
-  {
-    "model": "experience.experience",
-    "pk": 1,
-    "fields": {
-      "job_title": "Freelance Web Developer",
-      "company": "Self-Employed",
-      "location": "Lahore, Pakistan",
-      "start_date": "2023-02-01",
-      "end_date": null,
-      "is_current": true,
-      "description": "Built and delivered websites and web applications for clients, handling the full project lifecycle from requirements to deployment using C++, Python, and JavaScript.",
-      "technologies": "Python, JavaScript, C++, HTML, CSS, Git",
-      "order": 0
-    }
-  },
-  {
-    "model": "experience.experience",
-    "pk": 2,
-    "fields": {
-      "job_title": "eCommerce & Digital Marketing",
-      "company": "Self-Employed",
-      "location": "Lahore, Pakistan",
-      "start_date": "2022-05-01",
-      "end_date": "2023-01-31",
-      "is_current": false,
-      "description": "Set up online storefronts and ran advertising campaigns for clients using Shopify and social media platforms, managing product listings and ad performance.",
-      "technologies": "Shopify, Social Media Marketing, SEO",
-      "order": 1
-    }
-  },
-  {
-    "model": "experience.experience",
-    "pk": 3,
-    "fields": {
-      "job_title": "Smartphone Resale Business",
-      "company": "Self-Employed",
-      "location": "Lahore, Pakistan",
-      "start_date": "2021-03-01",
-      "end_date": "2022-04-30",
-      "is_current": false,
-      "description": "Ran a buy-sell-resale operation, gaining hands-on experience in customer dealing, negotiation, and product management.",
-      "technologies": "Customer Relations, Product Management",
-      "order": 2
-    }
-  },
-  {
-    "model": "experience.project",
-    "pk": 1,
-    "fields": {
-      "title": "AI Route Optimization",
-      "description": "Finds the shortest routes on a real city map using AI search algorithms (BFS, DFS, UCS, A*) on live OpenStreetMap data, with an interactive Streamlit dashboard that compares each algorithm.",
-      "technologies": "Python, Streamlit, OSMnx, NetworkX",
-      "image": "",
-      "github_url": "https://github.com/Yasir897/ai-route-optimization",
-      "live_url": "",
-      "is_featured": true,
-      "order": 0
-    }
-  },
-  {
-    "model": "experience.project",
-    "pk": 2,
-    "fields": {
-      "title": "Car Selling System",
-      "description": "A full-stack online marketplace for buying and selling cars, with listings, search, and a clean responsive interface.",
-      "technologies": "Next.js, TypeScript, React, Tailwind CSS",
-      "image": "",
-      "github_url": "https://github.com/Yasir897/car-selling-system",
-      "live_url": "",
-      "is_featured": true,
-      "order": 1
-    }
-  },
-  {
-    "model": "experience.project",
-    "pk": 3,
-    "fields": {
-      "title": "BudgetBuddy",
-      "description": "A personal budgeting and expense-management web app with a clean, responsive interface for tracking spending and managing budgets.",
-      "technologies": "React, TypeScript, Tailwind CSS",
-      "image": "",
-      "github_url": "https://github.com/Yasir897/budgetbuddy-co",
-      "live_url": "",
-      "is_featured": true,
-      "order": 2
-    }
-  },
-  {
-    "model": "experience.project",
-    "pk": 4,
-    "fields": {
-      "title": "Dynamic Portfolio",
-      "description": "This database-driven portfolio â€” bio, skills, education, experience, and projects are all managed through the Django admin panel, with an animated aurora UI and an interactive tech orbit.",
-      "technologies": "Django, Python, SQLite, JavaScript, CSS",
-      "image": "",
-      "github_url": "https://github.com/Yasir897/Yasir_Portfolio",
-      "live_url": "https://yasir897.pythonanywhere.com",
-      "is_featured": false,
-      "order": 3
-    }
-  },
-  {
-    "model": "experience.project",
-    "pk": 5,
-    "fields": {
-      "title": "WhatsApp Sender",
-      "description": "An automation tool that sends bulk WhatsApp messages to a list of numbers read from a data file, using Selenium to drive WhatsApp Web.",
-      "technologies": "Python, Selenium, Pandas",
-      "image": "",
-      "github_url": "https://github.com/Yasir897/whatsapp-sender",
-      "live_url": "",
-      "is_featured": false,
-      "order": 4
-    }
+{
+  "model": "bio.bio",
+  "pk": 1,
+  "fields": {
+    "name": "Yasir Naeem",
+    "job_title": "Full Stack Developer",
+    "tagline": "Full Stack Developer — turning ideas into real web apps with React, Next.js & Django.",
+    "profile_picture": "bio/yasir_naeem.png",
+    "description": "BS Computer Science student at the University of Management and Technology (UMT), Lahore, with 6 semesters completed. A Full Stack Developer comfortable across both frontend and backend, with a solid foundation in C++ and a good command of Python.\n\nExperienced in building complete web applications using React, Next.js, and Django, alongside hands-on work in automation and databases. I keep sharpening my programming and problem-solving skills by building real-world university and personal projects.",
+    "email": "yasir007naeem@gmail.com",
+    "phone": "+92 314 4107039",
+    "location": "Lahore, Pakistan",
+    "github_url": "https://github.com/Yasir897",
+    "linkedin_url": "https://www.linkedin.com/in/yasir-naeem-a5176a321/",
+    "resume_file": ""
   }
+},
+{
+  "model": "education.education",
+  "pk": 1,
+  "fields": {
+    "degree": "BS Computer Science",
+    "field_of_study": "Computer Science",
+    "institution": "University of Management and Technology (UMT)",
+    "location": "Lahore, Pakistan",
+    "start_year": 2022,
+    "end_year": 2026,
+    "is_current": true,
+    "grade": "6 Semesters Completed",
+    "description": "Currently pursuing BS Computer Science. Relevant coursework: Data Structures & Algorithms, Object-Oriented Programming, Database Systems, Web Technologies, Artificial Intelligence, and Operating Systems.",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skillcategory",
+  "pk": 1,
+  "fields": {
+    "name": "Languages",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skillcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Web & Frameworks",
+    "order": 1
+  }
+},
+{
+  "model": "skills.skillcategory",
+  "pk": 3,
+  "fields": {
+    "name": "Tools & Platforms",
+    "order": 2
+  }
+},
+{
+  "model": "skills.skillcategory",
+  "pk": 4,
+  "fields": {
+    "name": "Databases",
+    "order": 3
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 1,
+  "fields": {
+    "category": 1,
+    "name": "Python",
+    "proficiency": 85,
+    "icon_class": "devicon-python-plain",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 2,
+  "fields": {
+    "category": 1,
+    "name": "C++",
+    "proficiency": 80,
+    "icon_class": "devicon-cplusplus-plain",
+    "order": 1
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 3,
+  "fields": {
+    "category": 1,
+    "name": "JavaScript",
+    "proficiency": 80,
+    "icon_class": "devicon-javascript-plain",
+    "order": 2
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 4,
+  "fields": {
+    "category": 1,
+    "name": "TypeScript",
+    "proficiency": 75,
+    "icon_class": "devicon-typescript-plain",
+    "order": 3
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 5,
+  "fields": {
+    "category": 2,
+    "name": "Django",
+    "proficiency": 82,
+    "icon_class": "devicon-django-plain",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 6,
+  "fields": {
+    "category": 2,
+    "name": "React",
+    "proficiency": 80,
+    "icon_class": "devicon-react-original",
+    "order": 1
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 7,
+  "fields": {
+    "category": 2,
+    "name": "Next.js",
+    "proficiency": 75,
+    "icon_class": "devicon-nextjs-original",
+    "order": 2
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 8,
+  "fields": {
+    "category": 2,
+    "name": "HTML / CSS",
+    "proficiency": 90,
+    "icon_class": "devicon-html5-plain",
+    "order": 3
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 9,
+  "fields": {
+    "category": 2,
+    "name": "Tailwind CSS",
+    "proficiency": 80,
+    "icon_class": "devicon-tailwindcss-original",
+    "order": 4
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 10,
+  "fields": {
+    "category": 3,
+    "name": "Git & GitHub",
+    "proficiency": 85,
+    "icon_class": "devicon-github-original",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 11,
+  "fields": {
+    "category": 3,
+    "name": "VS Code",
+    "proficiency": 95,
+    "icon_class": "devicon-vscode-plain",
+    "order": 1
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 12,
+  "fields": {
+    "category": 3,
+    "name": "Automation (Selenium)",
+    "proficiency": 70,
+    "icon_class": "devicon-selenium-original",
+    "order": 2
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 13,
+  "fields": {
+    "category": 4,
+    "name": "SQL",
+    "proficiency": 75,
+    "icon_class": "devicon-azuresqldatabase-plain",
+    "order": 0
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 14,
+  "fields": {
+    "category": 4,
+    "name": "MySQL",
+    "proficiency": 70,
+    "icon_class": "devicon-mysql-plain",
+    "order": 1
+  }
+},
+{
+  "model": "skills.skill",
+  "pk": 15,
+  "fields": {
+    "category": 4,
+    "name": "SQLite",
+    "proficiency": 80,
+    "icon_class": "devicon-sqlite-plain",
+    "order": 2
+  }
+},
+{
+  "model": "experience.experience",
+  "pk": 1,
+  "fields": {
+    "job_title": "Freelance Web Developer",
+    "company": "Self-Employed",
+    "location": "Lahore, Pakistan",
+    "start_date": "2023-02-01",
+    "end_date": null,
+    "is_current": true,
+    "description": "Built and delivered websites and web applications for clients, handling the full project lifecycle from requirements to deployment using C++, Python, and JavaScript.",
+    "technologies": "Python, JavaScript, C++, HTML, CSS, Git",
+    "order": 0
+  }
+},
+{
+  "model": "experience.experience",
+  "pk": 2,
+  "fields": {
+    "job_title": "eCommerce & Digital Marketing",
+    "company": "Self-Employed",
+    "location": "Lahore, Pakistan",
+    "start_date": "2022-05-01",
+    "end_date": "2023-01-31",
+    "is_current": false,
+    "description": "Set up online storefronts and ran advertising campaigns for clients using Shopify and social media platforms, managing product listings and ad performance.",
+    "technologies": "Shopify, Social Media Marketing, SEO",
+    "order": 1
+  }
+},
+{
+  "model": "experience.experience",
+  "pk": 3,
+  "fields": {
+    "job_title": "Smartphone Resale Business",
+    "company": "Self-Employed",
+    "location": "Lahore, Pakistan",
+    "start_date": "2021-03-01",
+    "end_date": "2022-04-30",
+    "is_current": false,
+    "description": "Ran a buy-sell-resale operation, gaining hands-on experience in customer dealing, negotiation, and product management.",
+    "technologies": "Customer Relations, Product Management",
+    "order": 2
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 1,
+  "fields": {
+    "title": "AI Route Optimization",
+    "description": "Finds the shortest routes on a real city map using AI search algorithms (BFS, DFS, UCS, A*) on live OpenStreetMap data, with an interactive Streamlit dashboard that compares each algorithm.",
+    "technologies": "Python, Streamlit, OSMnx, NetworkX",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/ai-route-optimization",
+    "live_url": "",
+    "is_featured": true,
+    "order": 0
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 4,
+  "fields": {
+    "title": "Dynamic Portfolio",
+    "description": "This database-driven portfolio — bio, skills, education, experience, and projects are all managed through the Django admin panel, with an animated aurora UI and an interactive tech orbit.",
+    "technologies": "Django, Python, SQLite, JavaScript, CSS",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/Yasir_Portfolio",
+    "live_url": "https://yasir897.pythonanywhere.com",
+    "is_featured": false,
+    "order": 3
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 5,
+  "fields": {
+    "title": "WhatsApp Sender",
+    "description": "An automation tool that sends bulk WhatsApp messages to a list of numbers read from a data file, using Selenium to drive WhatsApp Web.",
+    "technologies": "Python, Selenium, Pandas",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/whatsapp-sender",
+    "live_url": "",
+    "is_featured": false,
+    "order": 4
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 6,
+  "fields": {
+    "title": "Hospital Management System",
+    "description": "A comprehensive console-based Hospital Management System in C++ using Object-Oriented Programming and file handling. Manages doctors, patients, pharmacy, blood bank, ambulance, equipment, lab reports and receipts — with all records persisted to files so data survives between runs.",
+    "technologies": "C++, OOP, File Handling",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/hospital-management-system-cpp",
+    "live_url": "",
+    "is_featured": true,
+    "order": 2
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 7,
+  "fields": {
+    "title": "Online Clothing Store",
+    "description": "A full e-commerce web application for an online clothing brand, built with PHP and MySQL. Features a product storefront, cart and checkout, user accounts, and a secure admin panel to add, edit and manage products.",
+    "technologies": "PHP, MySQL, HTML, CSS",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/online-clothing-store-php",
+    "live_url": "",
+    "is_featured": true,
+    "order": 3
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 8,
+  "fields": {
+    "title": "Hotel Management System (DSA)",
+    "description": "A Hotel Management System in C++ that demonstrates core data structures working together — Linked Lists for floors and rooms, a Queue for booking requests, and a Stack to cancel the last booking. My Data Structures & Algorithms semester project.",
+    "technologies": "C++, Data Structures, Linked List, Stack, Queue",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/hotel-management-dsa-cpp",
+    "live_url": "",
+    "is_featured": true,
+    "order": 4
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 9,
+  "fields": {
+    "title": "Flight Management System",
+    "description": "A console-based Flight / Airline Reservation System in C++ built with Object-Oriented Programming — inheritance with Person, Passenger and Staff classes, flight records, seat booking and incident reports.",
+    "technologies": "C++, OOP",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/flight-management-system-cpp",
+    "live_url": "",
+    "is_featured": false,
+    "order": 5
+  }
+},
+{
+  "model": "experience.project",
+  "pk": 10,
+  "fields": {
+    "title": "Tic-Tac-Toe (C++ OOP)",
+    "description": "A feature-rich two-player Tic-Tac-Toe game in C++ using OOP (classes, inheritance and friend classes). Supports in-game commands to edit a player's name, undo the last move, or exit at any time.",
+    "technologies": "C++, OOP",
+    "image": "",
+    "github_url": "https://github.com/Yasir897/tic-tac-toe-oop-cpp",
+    "live_url": "",
+    "is_featured": false,
+    "order": 6
+  }
+}
 ]
